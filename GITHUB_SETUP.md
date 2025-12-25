@@ -18,8 +18,8 @@
    ```
 
 2. **Update README.md Links**
-   - Replace `yourusername` with your actual GitHub username in all links
-   - Example: `https://github.com/yourusername/workflow-timer` → `https://github.com/fleizean/workflow-timer`
+   - Replace `fleizean` with your actual GitHub username in all links
+   - Example: `https://github.com/fleizean/workflow-timer` → `https://github.com/fleizean/workflow-timer`
 
 3. **Review package.json**
    - Update `author` field if needed
@@ -45,7 +45,7 @@ git add .
 git commit -m "Initial commit: Krono work timer application"
 
 # 4. Add GitHub remote (replace with your repo URL)
-git remote add origin https://github.com/yourusername/workflow-timer.git
+git remote add origin https://github.com/fleizean/workflow-timer.git
 
 # 5. Push to GitHub
 git branch -M main
@@ -98,7 +98,7 @@ The `.gitignore` file excludes:
 After your repo is on GitHub, contributors can:
 
 ```bash
-git clone https://github.com/yourusername/workflow-timer.git
+git clone https://github.com/fleizean/workflow-timer.git
 cd workflow-timer
 npm install
 npm start
