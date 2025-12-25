@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Settings</title>
+
+    <!-- Common Styles (fonts, global CSS) -->
+    <link rel="stylesheet" href="../styles/common.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Tailwind Configuration -->
+    <script src="../renderer/tailwind-config.js"></script>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display antialiased text-slate-900 dark:text-white overflow-x-hidden selection:bg-primary/30">
+    <div class="relative flex min-h-screen w-full flex-col max-w-md mx-auto border-x border-white/5 shadow-2xl">
+        <!-- Header -->
+        <header
+            class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-black/5 dark:border-white/5 px-4 pb-4 pt-2 transition-all duration-300">
+            <div class="flex items-center h-12 justify-between">
+                <button id="backButton"
+                    class="flex items-center justify-center w-10 h-10 -ml-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                    <span class="material-symbols-outlined text-[28px]">chevron_left</span>
+                </button>
+            </div>
+        </header>
+        <!-- Content Scroll Area -->
+        <main class="flex-1 flex flex-col px-4 pb-24 pt-2 overflow-y-auto no-scrollbar">
+            <!-- Section: Work Preferences -->
+            <div class="mt-6 mb-2">
+                <h3 class="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider px-1 mb-2">
+                    Work Preferences</h3>
+                <div class="flex flex-col gap-3">
+                    <!-- Daily Target Input -->
+                    <div
+                        class="bg-white dark:bg-surface-dark rounded-2xl p-4 shadow-sm border border-black/5 dark:border-white/5">
+                        <label class="flex flex-col w-full">
+                            <div class="flex justify-between items-center mb-2">
+                                <p class="text-slate-900 dark:text-white text-base font-medium">Daily Target</p>
+                                <span class="material-symbols-outlined text-primary">schedule</span>
+                            </div>
+                            <div class="relative">
+                                <button type="button" id="dailyTargetBtn"
+                                    class="form-input block w-full rounded-xl border-none bg-slate-100 dark:bg-[#233c48] text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 h-14 px-4 text-lg font-medium shadow-inner flex items-center justify-between">
+                                    <span id="dailyTargetDisplay">08:00</span>
+                                    <span class="material-symbols-outlined text-slate-400">schedule</span>
+                                </button>
+                                <input type="hidden" id="dailyTargetInput" value="08:00" />
+                            </div>
+                            <p class="text-slate-500 dark:text-[#92b7c9] text-xs mt-2 pl-1">Standard 8-hour work day is
+                                default.</p>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <!-- Section: Notifications -->
+            <div class="mt-6 mb-2">
+                <h3 class="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider px-1 mb-2">
+                    Notifications</h3>
+                <div
+                    class="bg-white dark:bg-surface-dark rounded-2xl overflow-hidden shadow-sm border border-black/5 dark:border-white/5 divide-y divide-slate-100 dark:divide-white/5">
+                    <!-- Item 1 -->
+                    <div
+                        class="flex items-center gap-4 px-4 py-4 justify-between hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer group">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400">
+                                <span class="material-symbols-outlined text-[20px]">flag</span>
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <p class="text-slate-900 dark:text-white text-base font-medium leading-normal">Goal
+                                    Reached</p>
+                            </div>
+                        </div>
+                        <div class="shrink-0">
+                            <label
+                                class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-slate-200 dark:bg-[#233c48] p-0.5 has-[:checked]:justify-end has-[:checked]:bg-primary transition-colors duration-200">
+                                <div
+                                    class="h-[27px] w-[27px] rounded-full bg-white shadow-sm transform transition-transform duration-200">
+                                </div>
+                                <input checked="" class="peer sr-only" type="checkbox" />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Section: General -->
+            <div class="mt-6 mb-2">
+                <h3 class="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider px-1 mb-2">
+                    General</h3>
+                <div
+                    class="bg-white dark:bg-surface-dark rounded-2xl overflow-hidden shadow-sm border border-black/5 dark:border-white/5">
+                    <!-- Item: About (Navigation) -->
+                    <button id="aboutButton"
+                        class="w-full flex items-center gap-4 px-4 py-4 justify-between hover:bg-slate-50 dark:hover:bg-white/5 transition-colors text-left">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300">
+                                <span class="material-symbols-outlined text-[20px]">info</span>
+                            </div>
+                            <p class="text-slate-900 dark:text-white text-base font-medium leading-normal">About</p>
+                        </div>
+                        <span class="material-symbols-outlined text-slate-400 text-[24px]">open_in_new</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Danger Zone -->
+            <div class="mt-8 mb-8">
+                <button
+                    class="w-full bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400 font-medium py-4 rounded-2xl border border-red-200 dark:border-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-[20px]">delete</span>
+                    Reset All Data
+                </button>
+                <p class="text-center text-slate-400 dark:text-slate-600 text-xs mt-4">Version 2.4.1 (Build 204)</p>
+            </div>
+        </main>
+        <!-- Sticky Save/Action Button -->
+        <div
+            class="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background-light via-background-light to-transparent dark:from-background-dark dark:via-background-dark dark:to-transparent pointer-events-none flex justify-center max-w-md mx-auto z-20 h-24 items-end">
+            <button
+                class="pointer-events-auto shadow-lg shadow-primary/30 w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-[0.98]">
+                <span class="material-symbols-outlined">save</span>
+                Save Changes
+            </button>
+        </div>
+    </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../renderer/shared.js"></script>
+    <!-- Settings JavaScript -->
+    <script>
+        // Show alert modal
+        function showAlert(message, type = 'info') {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+            const iconMap = {
+                info: { icon: 'info', color: 'blue' },
+                error: { icon: 'error', color: 'red' },
+                warning: { icon: 'warning', color: 'orange' },
+                success: { icon: 'check_circle', color: 'green' }
+            };
+            const config = iconMap[type] || iconMap.info;
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-surface-dark rounded-2xl p-6 w-80">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-full bg-${config.color}-100 dark:bg-${config.color}-900/20 mx-auto mb-4">
+                        <span class="material-symbols-outlined text-${config.color}-600 dark:text-${config.color}-400 text-3xl">${config.icon}</span>
+                    </div>
+                    <p class="text-slate-900 dark:text-white text-center mb-6">${message}</p>
+                    <button class="close-alert w-full bg-primary text-white rounded-xl py-3 font-semibold hover:bg-primary/90 transition">OK</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.querySelector('.close-alert').addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+        }
+
+        // Load settings on page load
+        async function loadSettings() {
+            const targetRes = await window.api.getSetting({ key: 'daily_target' });
+            if (targetRes.success && targetRes.value) {
+                const seconds = parseInt(targetRes.value);
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                document.getElementById('dailyTargetInput').value = timeStr;
+                document.getElementById('dailyTargetDisplay').textContent = timeStr;
+            }
+
+
+
+            // Load toggle states (only 2 now: goal and reminder)
+            const goalRes = await window.api.getSetting({ key: 'goal_notification' });
+            if (goalRes.success) {
+                document.querySelectorAll('input[type="checkbox"]')[0].checked = goalRes.value === 'true';
+            }
+        }
+
+        // Save settings
+        async function saveSettings() {
+            // Convert time to seconds
+            const timeValue = document.getElementById('dailyTargetInput').value;
+            const [hours, minutes] = timeValue.split(':').map(Number);
+            const dailyTargetSeconds = hours * 3600 + minutes * 60;
+
+
+
+            // Get toggle states
+            const goalNotif = document.querySelectorAll('input[type="checkbox"]')[0].checked;
+
+            // Save all settings
+            await window.api.setSetting({ key: 'daily_target', value: String(dailyTargetSeconds) });
+            await window.api.setSetting({ key: 'goal_notification', value: goalNotif ? 'true' : 'false' });
+
+            showAlert('Settings saved successfully!', 'success');
+        }
+
+        // Reset all data
+        async function resetAllData() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-surface-dark rounded-2xl p-6 w-80">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 mx-auto mb-4">
+                        <span class="material-symbols-outlined text-red-600 dark:text-red-400 text-3xl">delete_forever</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-slate-900 dark:text-white text-center">Delete All Sessions?</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm text-center mb-6">This will permanently delete all work sessions from your database. This action cannot be undone!</p>
+                    <div class="flex gap-3">
+                        <button class="cancel-delete flex-1 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl py-3 font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition">Cancel</button>
+                        <button class="confirm-delete flex-1 bg-red-600 dark:bg-red-500 text-white rounded-xl py-3 font-semibold hover:bg-red-700 dark:hover:bg-red-600 transition">Delete All</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            modal.querySelector('.confirm-delete').addEventListener('click', async () => {
+                const result = await window.api.deleteAllSessions();
+                modal.remove();
+
+                // Show success/error modal
+                const resultModal = document.createElement('div');
+                resultModal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+                resultModal.innerHTML = `
+                    <div class="bg-white dark:bg-surface-dark rounded-2xl p-6 w-80">
+                        <div class="flex items-center justify-center w-12 h-12 rounded-full ${result.success ? 'bg-green-100 dark:bg-green-900/20' : 'bg-red-100 dark:bg-red-900/20'} mx-auto mb-4">
+                            <span class="material-symbols-outlined ${result.success ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'} text-3xl">${result.success ? 'check_circle' : 'error'}</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2 text-slate-900 dark:text-white text-center">${result.success ? 'Success!' : 'Error'}</h3>
+                        <p class="text-slate-600 dark:text-slate-400 text-sm text-center mb-6">${result.success ? `Successfully deleted ${result.count} sessions!` : `Error: ${result.error}`}</p>
+                        <button class="close-result w-full bg-primary text-white rounded-xl py-3 font-semibold hover:bg-primary/90 transition">OK</button>
+                    </div>
+                `;
+                document.body.appendChild(resultModal);
+
+                resultModal.querySelector('.close-result').addEventListener('click', () => resultModal.remove());
+                resultModal.addEventListener('click', (e) => { if (e.target === resultModal) resultModal.remove(); });
+            });
+
+            modal.querySelector('.cancel-delete').addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+        }
+
+        // Time picker modal
+        document.getElementById('dailyTargetBtn').addEventListener('click', () => {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+
+            const currentValue = document.getElementById('dailyTargetInput').value;
+            const [currentHours, currentMinutes] = currentValue.split(':').map(Number);
+
+            const commonHours = [6, 7, 8, 9, 10, 12];
+
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-surface-dark rounded-2xl p-6 w-80 max-h-[80vh] overflow-y-auto">
+                    <h3 class="text-xl font-bold mb-4 text-slate-900 dark:text-white">Select Daily Target</h3>
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        ${commonHours.map(h => `
+                            <button class="quick-hour ${h === currentHours && currentMinutes === 0 ? 'bg-primary text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white'} rounded-xl py-3 font-semibold hover:bg-primary/90 transition" data-hours="${h}">${h} hours</button>
+                        `).join('')}
+                    </div>
+                    <div class="border-t border-slate-200 dark:border-slate-700 pt-4 mb-4">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Custom Time (24h format)</label>
+                        <div class="flex gap-2">
+                            <div class="flex-1">
+                                <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Hours</label>
+                                <input type="number" id="customHours" min="0" max="23" value="${currentHours}" class="w-full rounded-xl border-none bg-slate-100 dark:bg-[#233c48] text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 px-4 py-3" />
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Minutes</label>
+                                <input type="number" id="customMinutes" min="0" max="59" value="${currentMinutes}" class="w-full rounded-xl border-none bg-slate-100 dark:bg-[#233c48] text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 px-4 py-3" />
+                            </div>
+                        </div>
+                        <button id="applyCustomTime" class="w-full mt-3 bg-emerald-500 text-white rounded-xl py-3 font-semibold hover:bg-emerald-600 transition">Apply</button>
+                    </div>
+                    <button class="close-time-modal w-full bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl py-3 font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition">Close</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Quick hour buttons
+            modal.querySelectorAll('.quick-hour').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const hours = parseInt(btn.dataset.hours);
+                    const timeStr = `${String(hours).padStart(2, '0')}:00`;
+                    document.getElementById('dailyTargetInput').value = timeStr;
+                    document.getElementById('dailyTargetDisplay').textContent = timeStr;
+                    modal.remove();
+                });
+            });
+
+            // Custom time apply
+            modal.querySelector('#applyCustomTime').addEventListener('click', () => {
+                const hours = parseInt(modal.querySelector('#customHours').value) || 0;
+                const minutes = parseInt(modal.querySelector('#customMinutes').value) || 0;
+                const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+                document.getElementById('dailyTargetInput').value = timeStr;
+                document.getElementById('dailyTargetDisplay').textContent = timeStr;
+                modal.remove();
+            });
+
+            modal.querySelector('.close-time-modal').addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+        });
+
+        // Event listeners
+        document.getElementById('backButton').addEventListener('click', () => {
+            navigateWithLoading('index.html');
+        });
+
+        document.getElementById('aboutButton').addEventListener('click', () => {
+            window.open('https://www.fleizean.dev', '_blank');
+        });
+
+        document.querySelector('.fixed.bottom-0 button').addEventListener('click', saveSettings);
+
+        document.querySelector('.mt-8.mb-8 button').addEventListener('click', resetAllData);
+
+        // Load settings on init
+        loadSettings();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Workflow Timer</title>
+
+    <!-- Common Styles (fonts, global CSS) -->
+    <link rel="stylesheet" href="../styles/common.css">
+
+    <!-- Custom Title Bar -->
+    <link rel="stylesheet" href="../styles/titlebar.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Tailwind Configuration -->
+    <script src="../renderer/tailwind-config.js"></script>
+
+    <!-- Index-specific styles -->
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        /* Custom progress ring animation */
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+
+<body
+    class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-white antialiased selection:bg-primary selection:text-white">
+    <!-- Custom Title Bar -->
+    <div class="title-bar">
+        <div></div>
+        <div style="-webkit-app-region: no-drag; display: flex; gap: 0;">
+            <button onclick="window.api && window.api.minimizeWindow && window.api.minimizeWindow()"
+                title="Minimize">−</button>
+            <button onclick="window.api && window.api.closeWindow && window.api.closeWindow()" class="close"
+                title="Close">×</button>
+        </div>
+    </div>
+    <div class="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden max-w-md mx-auto shadow-2xl"
+        style="padding-top: 32px;">
+        <!-- TopAppBar -->
+        <header class="flex items-center p-6 justify-between z-10">
+            <button id="datePickerBtn"
+                class="text-slate-500 dark:text-slate-400 flex items-center gap-2 hover:bg-slate-200 dark:hover:bg-surface-dark px-3 py-2 rounded-xl transition-colors">
+                <span class="material-symbols-outlined text-2xl">calendar_month</span>
+                <span id="dateDisplayHeader" class="text-sm font-semibold tracking-wide">OCT 24</span>
+            </button>
+            <h1 class="text-lg font-bold leading-tight tracking-tight hidden">Work Timer</h1>
+            <!-- Hidden for semantic structure, visible title is visually hidden or implied -->
+            <button id="settingsBtn"
+                class="flex items-center justify-center rounded-full w-10 h-10 bg-slate-200 dark:bg-surface-dark hover:bg-slate-300 dark:hover:bg-[#233c48] transition-colors text-slate-900 dark:text-white">
+                <span class="material-symbols-outlined">settings</span>
+            </button>
+        </header>
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col px-6 pb-6 gap-8">
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-3 gap-3">
+                <div
+                    class="flex flex-col gap-1 rounded-2xl p-4 bg-white dark:bg-surface-dark shadow-sm border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#233c48] transition-all duration-300 hover:scale-105 cursor-pointer relative overflow-hidden group">
+                    <div
+                        class="absolute inset-0 bg-primary/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out rounded-2xl">
+                    </div>
+                    <div class="flex items-center gap-1.5 mb-1 relative z-10">
+                        <span class="material-symbols-outlined text-primary text-lg">flag</span>
+                        <p class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                            Daily
+                            Target</p>
+                    </div>
+                    <p class="text-xl font-bold leading-none tracking-tight relative z-10 whitespace-nowrap">08h 00m</p>
+                </div>
+                <div
+                    class="flex flex-col gap-1 rounded-2xl p-4 bg-white dark:bg-surface-dark shadow-sm border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#233c48] transition-all duration-300 hover:scale-105 cursor-pointer relative overflow-hidden group">
+                    <div
+                        class="absolute inset-0 bg-emerald-500/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out rounded-2xl">
+                    </div>
+                    <div class="flex items-center gap-1.5 mb-1 relative z-10">
+                        <span class="material-symbols-outlined text-emerald-500 text-lg">timelapse</span>
+                        <p class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                            Logged
+                        </p>
+                    </div>
+                    <p class="text-xl font-bold leading-none tracking-tight relative z-10 whitespace-nowrap">03h 15m</p>
+                </div>
+                <div
+                    class="flex flex-col gap-1 rounded-2xl p-4 bg-white dark:bg-surface-dark shadow-sm border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#233c48] transition-all duration-300 hover:scale-105 cursor-pointer relative overflow-hidden group">
+                    <div
+                        class="absolute inset-0 bg-orange-500/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out rounded-2xl">
+                    </div>
+                    <div class="flex items-center gap-1.5 mb-1 relative z-10">
+                        <span class="text-lg">🔥</span>
+                        <p class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                            Streak
+                        </p>
+                    </div>
+                    <p id="streakDisplay" class="text-xl font-bold leading-none tracking-tight relative z-10">0 days</p>
+                </div>
+            </div>
+            <!-- Main Timer Display -->
+            <div class="flex-1 flex flex-col items-center justify-center relative min-h-[320px]">
+                <!-- Headline Text -->
+                <h3 class="text-slate-400 dark:text-slate-500 text-sm font-bold uppercase tracking-[0.2em] mb-8">
+                    Remaining</h3>
+                <!-- Circular Progress Timer -->
+                <div class="relative w-72 h-72 flex items-center justify-center">
+                    <svg class="absolute w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+
+                        <circle class="text-slate-200 dark:text-white/5" cx="50" cy="50" fill="none" r="45"
+                            stroke="currentColor" stroke-width="6">
+                        </circle>
+
+                        <circle class="progress-ring__circle text-primary" cx="50" cy="50" fill="none" r="45"
+                            stroke="currentColor" stroke-dasharray="283" stroke-dashoffset="100" stroke-linecap="round"
+                            stroke-width="6">
+                        </circle>
+                    </svg>
+
+                    <div class="flex flex-col items-center z-10">
+                        <div class="flex items-baseline gap-1 text-slate-900 dark:text-white drop-shadow-md">
+                            <span class="text-6xl font-bold tracking-tighter tabular-nums">04</span>
+                            <span class="text-4xl font-light text-slate-400 dark:text-white/30 -mt-2">:</span>
+                            <span class="text-6xl font-bold tracking-tighter tabular-nums">45</span>
+                            <span class="text-4xl font-light text-slate-400 dark:text-white/30 -mt-2">:</span>
+                            <span
+                                class="text-4xl font-bold tracking-tighter tabular-nums text-slate-500 dark:text-slate-400">00</span>
+                        </div>
+
+                        <div
+                            class="mt-6 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 flex items-center gap-2 backdrop-blur-sm">
+                            <span class="relative flex h-2 w-2">
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                            </span>
+                            <span class="text-xs font-bold text-primary uppercase tracking-widest">Focused</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Meta Text -->
+                <div
+                    class="text-slate-400 dark:text-[#92b7c9] text-sm font-medium mt-8 flex flex-col items-center gap-1 bg-slate-100 dark:bg-surface-dark px-4 py-3 rounded-full">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-sm">schedule</span>
+                        <span id="finishTimeText">Not running</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Control Panel -->
+            <div class="flex flex-col gap-3">
+                <div class="flex items-center justify-between gap-4">
+                    <!-- Secondary: Adjust -->
+                    <button id="adjustButton"
+                        class="flex flex-col items-center justify-center w-16 h-16 rounded-2xl bg-slate-200 dark:bg-surface-dark text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-[#233c48] transition-all active:scale-95 group">
+                        <span
+                            class="material-symbols-outlined text-2xl group-hover:text-white transition-colors">edit</span>
+                        <span class="text-[10px] font-bold uppercase mt-1">Adjust</span>
+                    </button>
+                    <!-- Primary: Start/Pause -->
+                    <button id="playPauseButton"
+                        class="flex items-center justify-center w-24 h-24 rounded-full bg-primary text-white shadow-glow hover:bg-primary-dark transition-all active:scale-95 active:shadow-inner relative overflow-hidden group">
+                        <div
+                            class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out rounded-full">
+                        </div>
+                        <span class="material-symbols-outlined text-5xl relative z-10"
+                            style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                    </button>
+                    <!-- Secondary: Save -->
+                    <button id="saveButton"
+                        class="flex flex-col items-center justify-center w-16 h-16 rounded-2xl bg-slate-200 dark:bg-surface-dark text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-[#233c48] transition-all active:scale-95 group">
+                        <span
+                            class="material-symbols-outlined text-2xl group-hover:text-emerald-400 transition-colors">check</span>
+                        <span class="text-[10px] font-bold uppercase mt-1">Save</span>
+                    </button>
+                </div>
+                <!-- Reset Button -->
+                <button id="resetButton"
+                    class="w-full py-2.5 rounded-xl bg-slate-200 dark:bg-surface-dark text-slate-600 dark:text-slate-300 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-all active:scale-95 flex items-center justify-center gap-2 group">
+                    <span class="material-symbols-outlined text-lg">restart_alt</span>
+                    <span class="text-xs font-bold uppercase tracking-wider">Reset Timer</span>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Timer JavaScript -->
+    <!-- Scripts -->
+    <script src="../renderer/shared.js"></script>
+    <script src="../renderer/timer.js"></script>
+    <script>
+        // Initialize timer
+        const timer = new WorkTimer();
+        let dailyTarget = 28800; // 8 hours in seconds
+        let todayLogged = 0;
+        let currentDate = new Date(); // Current selected date
+
+        // DOM elements
+        const dateDisplayHeader = document.getElementById('dateDisplayHeader');
+        const datePickerBtn = document.getElementById('datePickerBtn');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const targetDisplay = document.querySelectorAll('.grid >div')[0].querySelector('p.text-xl');
+        const loggedDisplay = document.querySelectorAll('.grid > div')[1].querySelector('p.text-xl');
+        const streakDisplay = document.getElementById('streakDisplay');
+        const statusText = document.querySelector('h3.uppercase');
+        const timerDigits = document.querySelectorAll('.tabular-nums');
+        const playButton = document.getElementById('playPauseButton');
+        const adjustButton = document.getElementById('adjustButton');
+        const saveButton = document.getElementById('saveButton');
+        const resetButton = document.getElementById('resetButton');
+        const progressRing = document.querySelector('.progress-ring__circle');
+        const focusedBadge = document.querySelector('.mt-6.px-4');
+        const finishTimeText = document.getElementById('finishTimeText');
+
+        // Show alert modal helper
+        function showAlert(message, type = 'info') {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+            const iconMap = {
+                info: { icon: 'info', color: 'blue' },
+                error: { icon: 'error', color: 'red' },
+                warning: { icon: 'warning', color: 'orange' },
+                success: { icon: 'check_circle', color: 'green' }
+            };
+            const config = iconMap[type] || iconMap.info;
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-surface-dark rounded-2xl p-6 w-80">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-full bg-${config.color}-100 dark:bg-${config.color}-900/20 mx-auto mb-4">
+                        <span class="material-symbols-outlined text-${config.color}-600 dark:text-${config.color}-400 text-3xl">${config.icon}</span>
+                    </div>
+                    <p class="text-slate-900 dark:text-white text-center mb-6">${message}</p>
+                    <button class="close-alert w-full bg-primary text-white rounded-xl py-3 font-semibold hover:bg-primary/90 transition">OK</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.querySelector('.close-alert').addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+        }
+
+        // Update date display
+        function updateDateDisplay() {
+            const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+            dateDisplayHeader.textContent = `${months[currentDate.getMonth()]} ${currentDate.getDate()}`;
+        }
+
+        // Load data for selected date
+        async function loadDateData() {
+            // Load today's logged time for the selected date
+            const dateStr = currentDate.toISOString().split('T')[0];
+            const sessionsRes = await window.api.getSessionsByDate({ startDate: dateStr, endDate: dateStr });
+            if (sessionsRes.success) {
+                todayLogged = sessionsRes.sessions.reduce((sum, s) => sum + s.duration, 0);
+                loggedDisplay.textContent = formatTimeShort(todayLogged);
+                updateTimer(timer.getElapsed());
+            }
+        }
+
+        // Update streak display
+        async function updateStreak() {
+            const streakRes = await window.api.getCurrentStreak();
+            if (streakRes.success) {
+                const streak = streakRes.streak;
+                streakDisplay.textContent = streak === 1 ? '1 day' : `${streak} days`;
+            }
+        }
+
+        // Update UI on load
+        async function init() {
+            // Update date display
+            updateDateDisplay();
+
+            // Load settings
+            const targetRes = await window.api.getSetting({ key: 'daily_target' });
+            if (targetRes.success && targetRes.value) {
+                dailyTarget = parseInt(targetRes.value);
+                targetDisplay.textContent = formatTimeShort(dailyTarget);
+            }
+
+            // Load streak
+            await updateStreak();
+
+            // Load data for current date
+            await loadDateData();
+
+            // Load timer state after we have today's logged time
+            loadTimerState();
+        }
+
+        // LocalStorage timer persistence
+        function saveTimerState() {
+            const state = {
+                elapsed: timer.getElapsed(),
+                running: timer.isRunning(),
+                timestamp: Date.now()
+            };
+            localStorage.setItem('timerState', JSON.stringify(state));
+        }
+
+        function loadTimerState() {
+            const saved = localStorage.getItem('timerState');
+            if (saved) {
+                const state = JSON.parse(saved);
+                timer.elapsedSeconds = state.elapsed;
+                // Don't auto-start timer on page load, user must manually start it
+                // Just restore the elapsed time
+                updateTimer(state.elapsed);
+            } else {
+                // No saved state, initialize with 0
+                updateTimer(0);
+            }
+        }
+
+        // Update timer display
+        function updateTimer(elapsed) {
+            const remaining = dailyTarget - todayLogged - elapsed;
+            const isExceeded = remaining < 0;
+
+            // Update status text
+            statusText.textContent = isExceeded ? 'EXCEEDED' : 'REMAINING';
+            statusText.classList.toggle('text-red-400', isExceeded);
+
+            // Update time digits
+            const displayTime = Math.abs(remaining);
+            const formatted = formatTime(displayTime);
+            const parts = formatted.split(':');
+            timerDigits[0].textContent = parts[0];
+            timerDigits[1].textContent = parts[1];
+            timerDigits[2].textContent = parts[2];
+
+            // Update progress ring
+            const progress = ((todayLogged + elapsed) / dailyTarget) * 100;
+            const circumference = 283;
+            const offset = circumference - (Math.min(progress, 100) / 100) * circumference;
+            progressRing.setAttribute('stroke-dashoffset', offset);
+
+            // Change ring color based on progress
+            progressRing.classList.remove('text-primary', 'text-orange-500', 'text-emerald-500');
+            if (progress >= 100) {
+                progressRing.classList.add('text-emerald-500');
+            } else if (progress >= 80) {
+                progressRing.classList.add('text-orange-500');
+            } else {
+                progressRing.classList.add('text-primary');
+            }
+            // Update estimated finish time
+            if (!isExceeded && timer.isRunning()) {
+                const now = new Date();
+                const finish = new Date(now.getTime() + remaining * 1000);
+                const hours = String(finish.getHours()).padStart(2, '0');
+                const minutes = String(finish.getMinutes()).padStart(2, '0');
+                finishTimeText.textContent = `${hours}:${minutes}`;
+            } else if (isExceeded && !timer.goalReached) {
+                // Play notification sound when goal is reached
+                timer.goalReached = true;
+                playNotification();
+                finishTimeText.textContent = 'Goal Exceeded!';
+            } else {
+                finishTimeText.textContent = isExceeded ? 'Goal Exceeded!' : 'Not running';
+            }
+        }
+
+        // Play notification sound and show alert
+        function playNotification() {
+            try {
+                const audio = new Audio('../assets/notification.mp3');
+                audio.play().catch(err => console.log('Notification sound error:', err));
+            } catch (err) {
+                console.log('Audio not available:', err);
+            }
+
+            // Show congratulations modal
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-surface-dark rounded-2xl p-8 w-80 text-center animate-bounce-in">
+                    <div class="text-6xl mb-4">🎉</div>
+                    <h3 class="text-2xl font-bold mb-2 text-slate-900 dark:text-white">Tebrikler!</h3>
+                    <p class="text-slate-600 dark:text-slate-400 mb-6">Günlük hedefinize ulaştınız!</p>
+                    <button class="close-goal-alert w-full bg-primary text-white rounded-xl py-3 font-semibold hover:bg-primary/90 transition">Harika! 🔥</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.querySelector('.close-goal-alert').addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+
+            // Auto-close after 5 seconds
+            setTimeout(() => {
+                if (modal.parentElement) modal.remove();
+            }, 5000);
+        }
+
+        // Timer update callback
+        timer.onUpdate = (elapsed) => {
+            updateTimer(elapsed);
+            saveTimerState();
+        };
+
+        // Play/Pause button
+        playButton.addEventListener('click', () => {
+            if (timer.isRunning()) {
+                timer.pause();
+                playButton.querySelector('.material-symbols-outlined').textContent = 'play_arrow';
+                focusedBadge.style.display = 'none';
+            } else {
+                timer.start();
+                playButton.querySelector('.material-symbols-outlined').textContent = 'pause';
+                focusedBadge.style.display = 'flex';
+            }
+            saveTimerState();
+        });
+
+        // Adjust button
+        adjustButton.addEventListener('click', () => {
+            // Create adjust menu
+            const menu = document.createElement('div');
+            menu.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm';
+            menu.id = 'adjustModal';
+            menu.innerHTML = `
+    <div class="relative w-full max-w-sm bg-surface-dark rounded-3xl shadow-2xl border border-white/10 overflow-hidden transform transition-all">
+      <div class="px-6 pt-8 pb-4 flex flex-col items-center justify-center text-center">
+        <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-blue-900/50 to-primary/20 flex items-center justify-center mb-4 shadow-inner ring-1 ring-white/10">
+          <span class="material-symbols-outlined text-primary text-3xl">schedule</span>
+        </div>
+        <h2 class="text-2xl font-bold text-white tracking-tight">Adjust Time</h2>
+        <p class="text-sm text-gray-400 mt-2 font-medium">Modify the scheduled duration below.</p>
+      </div>
+      
+      <div class="px-6 py-2 grid grid-cols-2 gap-3">
+        <button class="adjust-btn flex items-center justify-center py-4 px-4 bg-primary/10 hover:bg-primary/20 text-blue-400 font-semibold rounded-2xl active:scale-95 transition-all duration-200 border border-primary/10 group" data-seconds="1800">
+          <span class="material-symbols-outlined mr-2 text-xl group-hover:scale-110 transition-transform">add</span>
+          30 min
+        </button>
+        <button class="adjust-btn flex items-center justify-center py-4 px-4 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-gray-200 font-semibold rounded-2xl active:scale-95 transition-all duration-200 border border-white/5 group" data-seconds="-1800">
+          <span class="material-symbols-outlined mr-2 text-xl group-hover:scale-110 transition-transform">remove</span>
+          30 min
+        </button>
+        <button class="adjust-btn flex items-center justify-center py-4 px-4 bg-primary/10 hover:bg-primary/20 text-blue-400 font-semibold rounded-2xl active:scale-95 transition-all duration-200 border border-primary/10 group" data-seconds="300">
+          <span class="material-symbols-outlined mr-2 text-xl group-hover:scale-110 transition-transform">add</span>
+          5 min
+        </button>
+        <button class="adjust-btn flex items-center justify-center py-4 px-4 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-gray-200 font-semibold rounded-2xl active:scale-95 transition-all duration-200 border border-white/5 group" data-seconds="-300">
+          <span class="material-symbols-outlined mr-2 text-xl group-hover:scale-110 transition-transform">remove</span>
+          5 min
+        </button>
+        <button class="adjust-btn flex items-center justify-center py-4 px-4 bg-primary/10 hover:bg-primary/20 text-blue-400 font-semibold rounded-2xl active:scale-95 transition-all duration-200 border border-primary/10 group" data-seconds="60">
+          <span class="material-symbols-outlined mr-2 text-xl group-hover:scale-110 transition-transform">add</span>
+          1 min
+        </button>
+        <button class="adjust-btn flex items-center justify-center py-4 px-4 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-gray-200 font-semibold rounded-2xl active:scale-95 transition-all duration-200 border border-white/5 group" data-seconds="-60">
+          <span class="material-symbols-outlined mr-2 text-xl group-hover:scale-110 transition-transform">remove</span>
+          1 min
+        </button>
+      </div>
+      
+      <div class="px-8 py-6">
+        <div class="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent w-full"></div>
+      </div>
+      
+      <div class="px-6 pb-2">
+        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 ml-1">
+          Manual Input (Minutes)
+        </label>
+        <div class="relative group">
+          <input type="number" id="manualMinutes" placeholder="0" class="w-full pl-5 pr-20 py-4 bg-[#27272a] border border-transparent focus:border-primary/50 text-white placeholder-gray-600 rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all outline-none text-lg font-medium shadow-inner" />
+          <button id="applyManual" class="absolute right-2 top-2 bottom-2 aspect-square bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white rounded-xl shadow-lg shadow-blue-500/20 active:scale-90 transition-all duration-300 flex items-center justify-center cursor-pointer group-focus-within:shadow-blue-500/40">
+            <span class="material-symbols-outlined text-[1.5rem]">check</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="p-6">
+        <button id="closeAdjustBtn" class="w-full py-4 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-semibold rounded-2xl active:scale-95 transition-all duration-200 border border-white/5 tracking-wide">
+          Close
+        </button>
+      </div>
+    </div>
+  `;
+            document.body.appendChild(menu);
+
+            // Adjust time buttons
+            menu.querySelectorAll('.adjust-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const seconds = parseInt(btn.dataset.seconds);
+                    timer.addSeconds(seconds);
+                    saveTimerState();
+                });
+            });
+
+            // Manual input
+            menu.querySelector('#applyManual').addEventListener('click', () => {
+                const minutes = parseInt(menu.querySelector('#manualMinutes').value) || 0;
+                timer.addSeconds(minutes * 60);
+                saveTimerState();
+                menu.querySelector('#manualMinutes').value = '';
+            });
+
+            // Close button
+            menu.querySelector('#closeAdjustBtn').addEventListener('click', () => {
+                menu.remove();
+            });
+
+            // Close on background click
+            menu.addEventListener('click', (e) => {
+                if (e.target === menu) {
+                    menu.remove();
+                }
+            });
+        });
+
+        // Save button
+        saveButton.addEventListener('click', async () => {
+            const elapsed = timer.getElapsed();
+
+            if (elapsed === 0) {
+                showAlert('No time to save!', 'warning');
+                return;
+            }
+
+            // Load companies first
+            const companiesResult = await window.api.getCompanies();
+            const companies = companiesResult.success ? companiesResult.companies : [];
+
+            // Create save session modal
+            const modal = createModernModal({
+                icon: 'save',
+                title: 'Save Work Session',
+                description: 'Save your progress to work history.',
+                content: `
+                    <div class="px-6 pb-6">
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 ml-1">Session Name</label>
+                            <input type="text" id="saveSessionName" placeholder="Work Session" value="Work Session" class="w-full pl-5 pr-5 py-4 bg-[#27272a] border border-transparent focus:border-primary/50 text-white placeholder-gray-600 rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all outline-none text-base font-medium shadow-inner" />
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 ml-1">Company</label>
+                            <div class="relative group">
+                                <div class="absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <span class="material-symbols-outlined text-primary text-xl">business</span>
+                                </div>
+                                <select id="saveSessionCompany" class="w-full pl-14 pr-12 py-4 bg-[#27272a] border border-transparent focus:border-primary/50 text-white rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all outline-none text-base font-medium shadow-inner appearance-none cursor-pointer">
+                                    ${companies.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+                                </select>
+                                <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <span class="material-symbols-outlined text-gray-400 text-xl">expand_more</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white/5 rounded-2xl p-4 mb-4 border border-white/10">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-medium text-gray-400">Duration</span>
+                                <span class="text-lg font-bold text-primary">${formatTimeShort(elapsed)}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-400">Date</span>
+                                <span class="text-sm font-semibold text-white">${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 ml-1">Note (Optional)</label>
+                            <textarea id="saveSessionNote" rows="3" placeholder="Add notes about this session..." class="w-full pl-5 pr-5 py-4 bg-[#27272a] border border-transparent focus:border-primary/50 text-white placeholder-gray-600 rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all outline-none text-base font-medium shadow-inner resize-none"></textarea>
+                        </div>
+                        <button id="confirmSave" class="w-full py-4 mb-3 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white font-semibold rounded-2xl active:scale-95 transition-all duration-200 shadow-lg shadow-blue-500/20">Save Session</button>
+                        <button class="close-save-modal w-full py-4 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-semibold rounded-2xl active:scale-95 transition-all duration-200 border border-white/5">Cancel</button>
+                    </div>
+                `
+            });
+            document.body.appendChild(modal);
+
+            // Auto-focus and select the input
+            const nameInput = modal.querySelector('#saveSessionName');
+            nameInput.focus();
+            nameInput.select();
+
+            // Confirm save handler
+            modal.querySelector('#confirmSave').addEventListener('click', async () => {
+                const name = nameInput.value.trim() || 'Work Session';
+                const companyId = parseInt(modal.querySelector('#saveSessionCompany').value);
+                const note = modal.querySelector('#saveSessionNote').value.trim() || null;
+
+                const result = await window.api.saveSession({
+                    name,
+                    duration: elapsed,
+                    date: getCurrentDate(),
+                    companyId,
+                    note
+                });
+
+                if (result.success) {
+                    // Update logged time
+                    todayLogged += elapsed;
+                    loggedDisplay.textContent = formatTimeShort(todayLogged);
+
+                    // Update streak
+                    await updateStreak();
+
+                    // Reset timer
+                    timer.reset();
+                    updateTimer(0);
+                    saveTimerState();
+
+                    modal.remove();
+                } else {
+                    showAlert('Error saving session: ' + result.error, 'error');
+                }
+            });
+
+            // Cancel handler
+            modal.querySelector('.close-save-modal').addEventListener('click', () => modal.remove());
+
+            // Close on background click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
+
+            // Enter key to save
+            nameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    modal.querySelector('#confirmSave').click();
+                }
+            });
+        });
+
+        // Reset button
+        resetButton.addEventListener('click', () => {
+            const modal = createModernModal({
+                icon: 'warning',
+                title: 'Reset Timer?',
+                description: 'This will clear the current elapsed time. This action cannot be undone.',
+                iconColor: 'from-red-900/50 to-red-500/20',
+                content: `
+                    <div class="px-6 pb-6">
+                        <div class="flex gap-3">
+                            <button class="cancel-reset flex-1 py-4 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-semibold rounded-2xl active:scale-95 transition-all duration-200 border border-white/5">Cancel</button>
+                            <button class="confirm-reset flex-1 py-4 bg-gradient-to-br from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 text-white font-semibold rounded-2xl active:scale-95 transition-all duration-200 shadow-lg shadow-red-500/20">Reset</button>
+                        </div>
+                    </div>
+                `
+            });
+            document.body.appendChild(modal);
+
+            modal.querySelector('.confirm-reset').addEventListener('click', () => {
+                timer.pause();
+                timer.reset();
+                updateTimer(0);
+                playButton.querySelector('.material-symbols-outlined').textContent = 'play_arrow';
+                focusedBadge.style.display = 'none';
+                saveTimerState();
+                modal.remove();
+                showAlert('Timer has been reset.', 'success');
+            });
+
+            modal.querySelector('.cancel-reset').addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+        });
+
+        // Date picker button
+        datePickerBtn.addEventListener('click', () => {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+
+            const today = new Date();
+            const isToday = currentDate.toDateString() === today.toDateString();
+
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-surface-dark rounded-2xl p-6 w-80 max-h-[80vh] overflow-y-auto">
+                    <h3 class="text-xl font-bold mb-4 text-slate-900 dark:text-white">Select Date</h3>
+                    <div class="flex flex-col gap-3 mb-4">
+                        <button class="date-opt ${isToday ? 'bg-primary text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white'} rounded-xl py-3 font-semibold hover:bg-primary/90 transition" data-offset="0">Today</button>
+                        <button class="date-opt bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl py-3 font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition" data-offset="-1">Yesterday</button>
+                        <button class="date-opt bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl py-3 font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition" data-offset="-2">2 Days Ago</button>
+                        <button class="date-opt bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl py-3 font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition" data-offset="-3">3 Days Ago</button>
+                    </div>
+                    <div class="border-t border-slate-200 dark:border-slate-700 pt-4 mb-4">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Custom Date</label>
+                        <input type="date" id="customDate" value="${currentDate.toISOString().split('T')[0]}" class="w-full rounded-xl border-none bg-slate-100 dark:bg-[#233c48] text-slate-900 dark:text-white dark:[color-scheme:dark] focus:ring-2 focus:ring-primary/50 px-4 py-3" />
+                    </div>
+                    <button class="close-date-modal w-full bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl py-3 font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition">Close</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Quick date buttons
+            modal.querySelectorAll('.date-opt').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const offset = parseInt(btn.dataset.offset);
+                    const newDate = new Date();
+                    newDate.setDate(newDate.getDate() + offset);
+                    currentDate = newDate;
+                    updateDateDisplay();
+                    loadDateData();
+                    modal.remove();
+                });
+            });
+
+            // Custom date input
+            modal.querySelector('#customDate').addEventListener('change', (e) => {
+                currentDate = new Date(e.target.value + 'T00:00:00');
+                updateDateDisplay();
+                loadDateData();
+                modal.remove();
+            });
+
+            modal.querySelector('.close-date-modal').addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+        });
+
+        // Settings button navigation
+        settingsBtn.addEventListener('click', () => {
+            navigateWithLoading('settings.html');
+        });
+
+        // Logged card navigation -> history
+        loggedDisplay.parentElement.parentElement.style.cursor = 'pointer';
+        loggedDisplay.parentElement.parentElement.addEventListener('click', () => {
+            navigateWithLoading('work-history.html');
+        });
+
+        // Initialize
+        init();
+    </script>
+</body>
+
+</html>

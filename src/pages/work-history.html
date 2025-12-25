@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Work History</title>
+
+    <!-- Common Styles (fonts, global CSS) -->
+    <link rel="stylesheet" href="../styles/common.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Tailwind Configuration -->
+    <script src="../renderer/tailwind-config.js"></script>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white antialiased selection:bg-primary/30">
+    <div class="relative flex h-full min-h-screen w-full flex-col overflow-hidden mx-auto max-w-md shadow-2xl">
+        <!-- Header -->
+        <header
+            class="sticky top-0 z-20 flex items-center justify-between bg-background-light/95 dark:bg-background-dark/95 px-4 pt-6 pb-4 backdrop-blur-md transition-colors duration-300">
+            <button
+                class="flex items-center justify-center w-10 h-10 -ml-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                id="backButton">
+                <span class="material-symbols-outlined text-[28px]">chevron_left</span>
+            </button>
+            <h2 class="text-2xl font-bold leading-tight tracking-tight flex-1 text-center">Work History</h2>
+            <div class="flex items-center justify-end gap-2 w-auto">
+                <button id="companiesButton"
+                    class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-slate-200 dark:bg-card-dark text-slate-900 dark:text-white transition hover:bg-slate-300 dark:hover:bg-[#233c48]">
+                    <span class="material-symbols-outlined text-[24px]">business</span>
+                </button>
+                <button id="filterButton"
+                    class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-slate-200 dark:bg-card-dark text-slate-900 dark:text-white transition hover:bg-slate-300 dark:hover:bg-[#233c48]">
+                    <span class="material-symbols-outlined text-[24px]">filter_list</span>
+                </button>
+            </div>
+        </header>
+        <!-- Main Content (Scrollable) -->
+        <main class="flex-1 overflow-y-auto no-scrollbar px-4 pb-24">
+            <!-- Summary Stats -->
+            <section class="mt-2 mb-6">
+                <div
+                    class="flex w-full flex-col gap-2 rounded-2xl bg-primary p-6 text-white shadow-lg shadow-primary/20 relative overflow-hidden">
+                    <!-- Background decoration -->
+                    <div class="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-white/10 blur-2xl"></div>
+                    <div class="absolute -left-4 -bottom-4 h-20 w-20 rounded-full bg-black/10 blur-xl"></div>
+                    <div class="relative z-10 flex items-center justify-between">
+                        <div>
+                            <p class="text-white/80 text-sm font-medium leading-normal mb-1">Total This Week</p>
+                            <h3 class="text-3xl font-bold leading-tight tracking-tight">38h 20m</h3>
+                        </div>
+                        <div
+                            class="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                            <span class="material-symbols-outlined text-[28px]">trending_up</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- This Week Section -->
+            <section class="mb-6">
+                <div class="mb-3 flex items-end justify-between px-1">
+                    <h3 class="text-slate-900 dark:text-white text-lg font-bold leading-tight">This Week</h3>
+                    <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Oct 12 - 18</span>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <!-- List Item 1: Over Target -->
+                    <div
+                        class="group flex items-center gap-4 rounded-xl bg-white dark:bg-card-dark p-4 shadow-sm transition-all hover:shadow-md border border-transparent dark:border-slate-800/50">
+                        <!-- Date Badge -->
+                        <div
+                            class="flex shrink-0 flex-col items-center justify-center rounded-lg bg-slate-100 dark:bg-[#233c48] h-14 w-14">
+                            <span class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400">Mon</span>
+                            <span class="text-xl font-bold text-slate-900 dark:text-white">12</span>
+                        </div>
+                        <!-- Info -->
+                        <div class="flex flex-1 flex-col justify-center overflow-hidden">
+                            <p class="truncate text-base font-semibold text-slate-900 dark:text-white">Project Alpha
+                                Design</p>
+                            <div class="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+                                <span class="material-symbols-outlined text-[14px]">schedule</span>
+                                <span>10:00 AM - 06:30 PM</span>
+                            </div>
+                        </div>
+                        <!-- Duration & Status -->
+                        <div class="flex shrink-0 flex-col items-end gap-1">
+                            <p class="text-base font-bold text-primary">8h 30m</p>
+                            <div
+                                class="flex items-center gap-1 rounded-full bg-green-500/10 dark:bg-green-400/10 px-1.5 py-0.5">
+                                <span
+                                    class="material-symbols-outlined text-[12px] text-green-600 dark:text-green-400 font-bold">check</span>
+                                <span
+                                    class="text-[10px] font-bold text-green-600 dark:text-green-400 uppercase tracking-wider">Goal</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- List Item 2: Normal -->
+                    <div
+                        class="group flex items-center gap-4 rounded-xl bg-white dark:bg-card-dark p-4 shadow-sm transition-all hover:shadow-md border border-transparent dark:border-slate-800/50">
+                        <div
+                            class="flex shrink-0 flex-col items-center justify-center rounded-lg bg-slate-100 dark:bg-[#233c48] h-14 w-14">
+                            <span class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400">Tue</span>
+                            <span class="text-xl font-bold text-slate-900 dark:text-white">13</span>
+                        </div>
+                        <div class="flex flex-1 flex-col justify-center overflow-hidden">
+                            <p class="truncate text-base font-semibold text-slate-900 dark:text-white">Client Meeting
+                            </p>
+                            <div class="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+                                <span class="material-symbols-outlined text-[14px]">schedule</span>
+                                <span>09:00 AM - 11:00 AM</span>
+                            </div>
+                        </div>
+                        <div class="flex shrink-0 flex-col items-end gap-1">
+                            <p class="text-base font-bold text-slate-700 dark:text-slate-300">2h 00m</p>
+                        </div>
+                    </div>
+                    <!-- List Item 3: Over Target -->
+                    <div
+                        class="group flex items-center gap-4 rounded-xl bg-white dark:bg-card-dark p-4 shadow-sm transition-all hover:shadow-md border border-transparent dark:border-slate-800/50">
+                        <div
+                            class="flex shrink-0 flex-col items-center justify-center rounded-lg bg-slate-100 dark:bg-[#233c48] h-14 w-14">
+                            <span class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400">Wed</span>
+                            <span class="text-xl font-bold text-slate-900 dark:text-white">14</span>
+                        </div>
+                        <div class="flex flex-1 flex-col justify-center overflow-hidden">
+                            <p class="truncate text-base font-semibold text-slate-900 dark:text-white">Development
+                                Sprint</p>
+                            <div class="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+                                <span class="material-symbols-outlined text-[14px]">schedule</span>
+                                <span>09:00 AM - 07:00 PM</span>
+                            </div>
+                        </div>
+                        <div class="flex shrink-0 flex-col items-end gap-1">
+                            <p class="text-base font-bold text-primary">10h 00m</p>
+                            <div
+                                class="flex items-center gap-1 rounded-full bg-green-500/10 dark:bg-green-400/10 px-1.5 py-0.5">
+                                <span
+                                    class="material-symbols-outlined text-[12px] text-green-600 dark:text-green-400 font-bold">check</span>
+                                <span
+                                    class="text-[10px] font-bold text-green-600 dark:text-green-400 uppercase tracking-wider">Goal</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Last Week Section -->
+            <section class="mb-6">
+                <div class="mb-3 flex items-end justify-between px-1">
+                    <h3 class="text-slate-900 dark:text-white text-lg font-bold leading-tight">Last Week</h3>
+                    <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Oct 05 - 11</span>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <!-- List Item 4 -->
+                    <div
+                        class="group flex items-center gap-4 rounded-xl bg-white dark:bg-card-dark p-4 shadow-sm transition-all hover:shadow-md border border-transparent dark:border-slate-800/50 opacity-80 hover:opacity-100">
+                        <div
+                            class="flex shrink-0 flex-col items-center justify-center rounded-lg bg-slate-100 dark:bg-[#233c48] h-14 w-14">
+                            <span class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400">Fri</span>
+                            <span class="text-xl font-bold text-slate-900 dark:text-white">09</span>
+                        </div>
+                        <div class="flex flex-1 flex-col justify-center overflow-hidden">
+                            <p class="truncate text-base font-semibold text-slate-900 dark:text-white">Final Review</p>
+                            <div class="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+                                <span class="material-symbols-outlined text-[14px]">schedule</span>
+                                <span>02:00 PM - 05:00 PM</span>
+                            </div>
+                        </div>
+                        <div class="flex shrink-0 flex-col items-end gap-1">
+                            <p class="text-base font-bold text-slate-700 dark:text-slate-300">3h 00m</p>
+                        </div>
+                    </div>
+                    <!-- List Item 5 -->
+                    <div
+                        class="group flex items-center gap-4 rounded-xl bg-white dark:bg-card-dark p-4 shadow-sm transition-all hover:shadow-md border border-transparent dark:border-slate-800/50 opacity-80 hover:opacity-100">
+                        <div
+                            class="flex shrink-0 flex-col items-center justify-center rounded-lg bg-slate-100 dark:bg-[#233c48] h-14 w-14">
+                            <span class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400">Thu</span>
+                            <span class="text-xl font-bold text-slate-900 dark:text-white">08</span>
+                        </div>
+                        <div class="flex flex-1 flex-col justify-center overflow-hidden">
+                            <p class="truncate text-base font-semibold text-slate-900 dark:text-white">Bug Fixing</p>
+                            <div class="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+                                <span class="material-symbols-outlined text-[14px]">schedule</span>
+                                <span>10:00 AM - 04:30 PM</span>
+                            </div>
+                        </div>
+                        <div class="flex shrink-0 flex-col items-end gap-1">
+                            <p class="text-base font-bold text-slate-700 dark:text-slate-300">6h 30m</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <!-- Floating Action Button -->
+        <button id="addSessionFAB"
+            class="fixed bottom-6 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-xl shadow-primary/30 transition-transform hover:scale-110 active:scale-95">
+            <span class="material-symbols-outlined text-[28px]">add</span>
+        </button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../renderer/shared.js"></script>
+    <script src="../renderer/timer.js"></script>
+    <script>
+        // Show alert modal
+        function showToast(message, type = 'info') {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+            const iconMap = {
+                info: { icon: 'info', color: 'blue' },
+                error: { icon: 'error', color: 'red' },
+                warning: { icon: 'warning', color: 'orange' },
+                success: { icon: 'check_circle', color: 'green' }
+            };
+            const config = iconMap[type] || iconMap.info;
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-card-dark rounded-2xl p-6 w-80">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-full bg-${config.color}-100 dark:bg-${config.color}-900/20 mx-auto mb-4">
+                        <span class="material-symbols-outlined text-${config.color}-600 dark:text-${config.color}-400 text-3xl">${config.icon}</span>
+                    </div>
+                    <p class="text-slate-900 dark:text-white text-center mb-6">${message}</p>
+                    <button class="close-alert w-full bg-primary text-white rounded-xl py-3 font-semibold hover:bg-primary/90 transition">OK</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.querySelector('.close-alert').addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+        }
+
+        // Delete session with confirmation
+        async function deleteSessionWithConfirm(sessionId, sessionName) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-card-dark rounded-2xl p-6 w-80">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 mx-auto mb-4">
+                        <span class="material-symbols-outlined text-red-600 dark:text-red-400 text-3xl">delete</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white text-center mb-2">Delete Session?</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-center mb-6">Are you sure you want to delete "${sessionName}"? This action cannot be undone.</p>
+                    <div class="flex gap-3">
+                        <button class="cancel-delete flex-1 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl py-3 font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition">Cancel</button>
+                        <button class="confirm-delete flex-1 bg-red-600 text-white rounded-xl py-3 font-semibold hover:bg-red-700 transition">Delete</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Cancel button
+            modal.querySelector('.cancel-delete').addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+
+            // Confirm delete button
+            modal.querySelector('.confirm-delete').addEventListener('click', async () => {
+                modal.remove();
+                const result = await window.api.deleteSession({ id: sessionId });
+
+                if (result.success) {
+                    await loadHistory();
+                    showToast('Session deleted successfully', 'success');
+                } else {
+                    showToast('Error: ' + result.error, 'error');
+                }
+            });
+        }
+
+        // Edit session
+        async function editSession(sessionId) {
+            // Get the session details and companies
+            const sessionsResult = await window.api.getSessions();
+            const companiesResult = await window.api.getCompanies();
+
+            if (!sessionsResult.success || !companiesResult.success) {
+                showToast('Error loading data', 'error');
+                return;
+            }
+
+            const session = sessionsResult.sessions.find(s => s.id === sessionId);
+            if (!session) {
+                showToast('Session not found', 'error');
+                return;
+            }
+
+            const companies = companiesResult.companies;
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+
+            // Create company options HTML
+            const companyOptions = companies.map(company =>
+                `<option value="${company.id}" ${session.company_id === company.id ? 'selected' : ''}>${company.name}</option>`
+            ).join('');
+
+            // Calculate hours from duration
+            const hours = (session.duration / 3600).toFixed(1);
+
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm px-4';
+            modal.innerHTML = `
+                <div class="relative w-full max-w-sm bg-surface-dark rounded-3xl shadow-2xl border border-white/10 overflow-hidden transform transition-all">
+                    <div class="px-6 pt-8 pb-4 flex flex-col items-center justify-center text-center">
+                        <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-blue-900/50 to-primary/20 flex items-center justify-center mb-4 shadow-inner ring-1 ring-white/10">
+                            <span class="material-symbols-outlined text-primary text-3xl">edit</span>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">Edit Work Session</h2>
+                        <p class="text-sm text-gray-400 mt-2 font-medium">Update session details below.</p>
+                    </div>
+                    <div class="px-6 pb-6">
+                        <div class="flex flex-col gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 ml-1">Session Name</label>
+                                <input type="text" id="editSessionName" value="${session.name}" class="w-full pl-5 pr-5 py-4 bg-[#27272a] border border-transparent focus:border-primary/50 text-white placeholder-gray-600 rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all outline-none text-base font-medium shadow-inner" />
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 ml-1">Company</label>
+                                <div class="relative group">
+                                    <div class="absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none">
+                                        <span class="material-symbols-outlined text-primary text-xl">business</span>
+                                    </div>
+                                    <select id="editSessionCompany" class="w-full pl-14 pr-12 py-4 bg-[#27272a] border border-transparent focus:border-primary/50 text-white rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all outline-none text-base font-medium shadow-inner appearance-none cursor-pointer">
+                                        ${companyOptions}
+                                    </select>
+                                    <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
+                                        <span class="material-symbols-outlined text-gray-400 text-xl">expand_more</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 ml-1">Duration (hours)</label>
+                                <input type="number" id="editSessionHours" value="${hours}" min="0" step="0.5" class="w-full pl-5 pr-5 py-4 bg-[#27272a] border border-transparent focus:border-primary/50 text-white placeholder-gray-600 rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all outline-none text-base font-medium shadow-inner" />
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 ml-1">Date</label>
+                                <input type="date" id="editSessionDate" value="${session.date}" class="w-full pl-5 pr-5 py-4 bg-[#27272a] border border-transparent focus:border-primary/50 text-white rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all outline-none text-base font-medium shadow-inner [color-scheme:dark]" />
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 ml-1">Note (Optional)</label>
+                                <textarea id="editSessionNote" rows="3" placeholder="Add a note..." class="w-full pl-5 pr-5 py-4 bg-[#27272a] border border-transparent focus:border-primary/50 text-white placeholder-gray-600 rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all outline-none text-base font-medium shadow-inner resize-none">${session.note || ''}</textarea>
+                            </div>
+                            <button id="saveEditSession" class="w-full py-4 mt-2 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white font-semibold rounded-2xl active:scale-95 transition-all duration-200 shadow-lg shadow-blue-500/20">Save Changes</button>
+                            <button class="close-edit-modal w-full py-4 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-semibold rounded-2xl active:scale-95 transition-all duration-200 border border-white/5">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            modal.querySelector('#saveEditSession').addEventListener('click', async () => {
+                const name = modal.querySelector('#editSessionName').value.trim();
+                const companyId = parseInt(modal.querySelector('#editSessionCompany').value);
+                const hours = parseFloat(modal.querySelector('#editSessionHours').value);
+                const date = modal.querySelector('#editSessionDate').value;
+                const note = modal.querySelector('#editSessionNote').value.trim() || null;
+
+                if (!name || hours <= 0 || !date) {
+                    showToast('Please fill in all required fields', 'warning');
+                    return;
+                }
+
+                const result = await window.api.updateSession({
+                    id: sessionId,
+                    name,
+                    duration: Math.floor(hours * 3600),
+                    date,
+                    companyId,
+                    note
+                });
+
+                if (result.success) {
+                    modal.remove();
+                    await loadHistory();
+                    showToast('Session updated successfully', 'success');
+                } else {
+                    showToast('Error: ' + result.error, 'error');
+                }
+            });
+
+            modal.querySelector('.close-edit-modal').addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+        }
+
+
+
+        // Load and display sessions
+        async function loadHistory() {
+            const result = await window.api.getSessions();
+
+            if (!result.success) {
+                console.error('Failed to load sessions:', result.error);
+                return;
+            }
+
+            let sessions = result.sessions;
+
+            // Apply filter
+            const now = new Date();
+            if (currentFilter === 'thisWeek') {
+                const { thisWeek } = groupSessionsByWeek(sessions);
+                sessions = thisWeek;
+            } else if (currentFilter === 'lastWeek') {
+                const { lastWeek } = groupSessionsByWeek(sessions);
+                sessions = lastWeek;
+            } else if (currentFilter === 'thisMonth') {
+                const thisMonth = now.getMonth();
+                const thisYear = now.getFullYear();
+                sessions = sessions.filter(s => {
+                    const d = new Date(s.date);
+                    return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+                });
+            }
+
+            // Update week totals
+            const weekResult = await window.api.getWeekTotal();
+            if (weekResult.success) {
+                document.querySelector('.text-3xl.font-bold').textContent = formatTimeShort(weekResult.thisWeek);
+
+                // Calculate percentage change
+                const change = weekResult.lastWeek > 0
+                    ? Math.round(((weekResult.thisWeek - weekResult.lastWeek) / weekResult.lastWeek) * 100)
+                    : 0;
+                const changeText = change >= 0 ? `+${change}%` : `${change}%`;
+                document.querySelector('.flex.items-center.gap-1.rounded-full span:nth-child(2)').textContent = changeText;
+            }
+
+            // Group sessions by week for display
+            const { thisWeek, lastWeek } = groupSessionsByWeek(sessions);
+            const dailyTarget = 28800; // 8 hours
+
+            // Render this week
+            const thisWeekContainer = document.querySelector('.mb-6:nth-of-type(2) .flex.flex-col.gap-3');
+            thisWeekContainer.innerHTML = '';
+
+            thisWeek.forEach(session => {
+                const { day, date } = formatDateBadge(session.date);
+                const isGoal = session.duration >= dailyTarget;
+
+                thisWeekContainer.innerHTML += `
+      <div class="group flex items-center gap-4 rounded-xl bg-white dark:bg-card-dark p-4 shadow-sm transition-all hover:shadow-md border border-transparent dark:border-slate-800/50">
+        <div class="flex shrink-0 flex-col items-center justify-center rounded-lg bg-slate-100 dark:bg-[#233c48] h-14 w-14">
+          <span class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400">${day}</span>
+          <span class="text-xl font-bold text-slate-900 dark:text-white">${date}</span>
+        </div>
+        <div class="flex flex-1 flex-col justify-center overflow-hidden">
+          <p class="truncate text-base font-semibold text-slate-900 dark:text-white">${session.name}</p>
+          <div class="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+            <span class="material-symbols-outlined text-[14px]">schedule</span>
+            <span>${session.created_at ? new Date(session.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : 'Today'}</span>
+          </div>
+        </div>
+        <div class="flex shrink-0 flex-col items-end gap-1">
+          <div class="flex items-center gap-2">
+            <div class="flex flex-col items-end gap-1">
+              <p class="text-base font-bold ${isGoal ? 'text-primary' : 'text-slate-700 dark:text-slate-300'}">${formatTimeShort(session.duration)}</p>
+              ${isGoal ? `
+                <div class="flex items-center gap-1 rounded-full bg-green-500/10 dark:bg-green-400/10 px-1.5 py-0.5">
+                  <span class="material-symbols-outlined text-[12px] text-green-600 dark:text-green-400 font-bold">check</span>
+                  <span class="text-[10px] font-bold text-green-600 dark:text-green-400 uppercase tracking-wider">Goal</span>
+                </div>
+              ` : ''}
+            </div>
+            <button 
+              onclick="editSession(${session.id})"
+              class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center w-8 h-8 rounded-lg bg-blue-500/10 dark:bg-blue-400/10 hover:bg-blue-500/20 dark:hover:bg-blue-400/20 text-blue-600 dark:text-blue-400">
+              <span class="material-symbols-outlined text-[18px]">edit</span>
+            </button>
+            <button 
+              onclick="deleteSessionWithConfirm(${session.id}, '${session.name.replace(/'/g, "\\'")}')"
+              class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center w-8 h-8 rounded-lg bg-red-500/10 dark:bg-red-400/10 hover:bg-red-500/20 dark:hover:bg-red-400/20 text-red-600 dark:text-red-400">
+              <span class="material-symbols-outlined text-[18px]">delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+            });
+
+            // Render last week
+            const lastWeekContainer = document.querySelector('.mb-6:nth-of-type(3) .flex.flex-col.gap-3');
+            lastWeekContainer.innerHTML = '';
+
+            lastWeek.slice(0, 5).forEach(session => {
+                const { day, date } = formatDateBadge(session.date);
+
+                lastWeekContainer.innerHTML += `
+      <div class="group flex items-center gap-4 rounded-xl bg-white dark:bg-card-dark p-4 shadow-sm transition-all hover:shadow-md border border-transparent dark:border-slate-800/50 opacity-80 hover:opacity-100">
+        <div class="flex shrink-0 flex-col items-center justify-center rounded-lg bg-slate-100 dark:bg-[#233c48] h-14 w-14">
+          <span class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400">${day}</span>
+          <span class="text-xl font-bold text-slate-900 dark:text-white">${date}</span>
+        </div>
+        <div class="flex flex-1 flex-col justify-center overflow-hidden">
+          <p class="truncate text-base font-semibold text-slate-900 dark:text-white">${session.name}</p>
+          <div class="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
+            <span class="material-symbols-outlined text-[14px]">schedule</span>
+            <span>${session.created_at ? new Date(session.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : ''}</span>
+          </div>
+        </div>
+        <div class="flex shrink-0 flex-col items-end gap-1">
+          <div class="flex items-center gap-2">
+            <p class="text-base font-bold text-slate-700 dark:text-slate-300">${formatTimeShort(session.duration)}</p>
+            <button 
+              onclick="editSession(${session.id})"
+              class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center w-8 h-8 rounded-lg bg-blue-500/10 dark:bg-blue-400/10 hover:bg-blue-500/20 dark:hover:bg-blue-400/20 text-blue-600 dark:text-blue-400">
+              <span class="material-symbols-outlined text-[18px]">edit</span>
+            </button>
+            <button 
+              onclick="deleteSessionWithConfirm(${session.id}, '${session.name.replace(/'/g, "\\'")}')"
+              class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center w-8 h-8 rounded-lg bg-red-500/10 dark:bg-red-400/10 hover:bg-red-500/20 dark:hover:bg-red-400/20 text-red-600 dark:text-red-400">
+              <span class="material-symbols-outlined text-[18px]">delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+            });
+        }
+
+        // Navigation - Back button
+        document.getElementById('backButton').addEventListener('click', () => {
+            navigateWithLoading('index.html');
+        });
+
+        // Navigate to Companies page
+        document.getElementById('companiesButton').addEventListener('click', () => {
+            navigateWithLoading('companies.html');
+        });
+
+        // Get current filter from localStorage
+        let currentFilter = localStorage.getItem('sessionFilter') || 'all';
+
+        // Filter button modal
+        document.getElementById('filterButton').addEventListener('click', () => {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+
+            const filters = [
+                { id: 'all', label: 'All Time' },
+                { id: 'thisWeek', label: 'This Week' },
+                { id: 'lastWeek', label: 'Last Week' },
+                { id: 'thisMonth', label: 'This Month' }
+            ];
+
+            const buttonsHTML = filters.map(f => {
+                const isActive = currentFilter === f.id;
+                const classes = isActive
+                    ? 'filter-opt bg-primary text-white rounded-xl py-3 font-semibold hover:bg-primary/90 transition'
+                    : 'filter-opt bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl py-3 font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition';
+                return `<button class="${classes}" data-filter="${f.id}">${f.label}</button>`;
+            }).join('');
+
+            modal.innerHTML = `
+                <div class="bg-white dark:bg-card-dark rounded-2xl p-6 w-80 max-h-[80vh] overflow-y-auto">
+                    <h3 class="text-xl font-bold mb-4 text-slate-900 dark:text-white">Filter Sessions</h3>
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        ${buttonsHTML}
+                    </div>
+                    <button class="close-modal w-full bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl py-3 font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition">Close</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Filter option click handlers
+            modal.querySelectorAll('.filter-opt').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentFilter = btn.dataset.filter;
+                    localStorage.setItem('sessionFilter', currentFilter);
+                    modal.remove();
+                    loadHistory();
+                });
+            });
+
+            modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+        });
+
+        // Add session FAB
+        document.getElementById('addSessionFAB').addEventListener('click', () => {
+            const modal = createModernModal({
+                icon: 'add_circle',
+                title: 'Add Work Session',
+                description: 'Create a new work session entry.',
+                content: `
+                    <div class="px-6 pb-6">
+                        <div class="flex flex-col gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 ml-1">Session Name</label>
+                                <input type="text" id="sessionName" placeholder="Work Session" class="w-full pl-5 pr-5 py-4 bg-[#27272a] border border-transparent focus:border-primary/50 text-white placeholder-gray-600 rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all outline-none text-base font-medium shadow-inner" />
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 ml-1">Duration (hours)</label>
+                                <input type="number" id="sessionHours" placeholder="8" min="0" step="0.5" class="w-full pl-5 pr-5 py-4 bg-[#27272a] border border-transparent focus:border-primary/50 text-white placeholder-gray-600 rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all outline-none text-base font-medium shadow-inner" />
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 ml-1">Date</label>
+                                <button type="button" id="sessionDateBtn" class="w-full pl-5 pr-5 py-4 bg-[#27272a] border border-transparent focus:border-primary/50 text-white rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all outline-none text-base font-medium shadow-inner text-left flex items-center justify-between">
+                                    <span id="sessionDateDisplay">Select date</span>
+                                    <span class="material-symbols-outlined text-gray-400">calendar_today</span>
+                                </button>
+                                <input type="hidden" id="sessionDate" />
+                            </div>
+                            <button id="saveNewSession" class="w-full py-4 mt-2 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white font-semibold rounded-2xl active:scale-95 transition-all duration-200 shadow-lg shadow-blue-500/20">Save Session</button>
+                            <button class="close-add-modal w-full py-4 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-semibold rounded-2xl active:scale-95 transition-all duration-200 border border-white/5">Cancel</button>
+                        </div>
+                    </div>
+                `
+            });
+            document.body.appendChild(modal);
+
+            // Set today as default
+            let selectedDate = new Date();
+            const sessionDateInput = modal.querySelector('#sessionDate');
+            const sessionDateDisplay = modal.querySelector('#sessionDateDisplay');
+            const sessionDateBtn = modal.querySelector('#sessionDateBtn');
+
+            sessionDateInput.value = selectedDate.toISOString().split('T')[0];
+            sessionDateDisplay.textContent = selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+            // Date picker button click
+            sessionDateBtn.addEventListener('click', () => {
+                const dateModal = document.createElement('div');
+                dateModal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+
+                const today = new Date();
+                const isToday = selectedDate.toDateString() === today.toDateString();
+
+                dateModal.innerHTML = `
+                    <div class="bg-white dark:bg-card-dark rounded-2xl p-6 w-80">
+                        <h3 class="text-xl font-bold mb-4 text-slate-900 dark:text-white">Select Date</h3>
+                        <div class="flex flex-col gap-3 mb-4">
+                            <button class="quick-date ${isToday ? 'bg-primary text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white'} rounded-xl py-3 font-semibold hover:bg-primary/90 transition" data-offset="0">Today</button>
+                            <button class="quick-date bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl py-3 font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition" data-offset="-1">Yesterday</button>
+                            <button class="quick-date bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl py-3 font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition" data-offset="-2">2 Days Ago</button>
+                        </div>
+                        <div class="border-t border-slate-200 dark:border-slate-700 pt-4 mb-4">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Custom Date</label>
+                            <input type="date" id="customDatePicker" value="${selectedDate.toISOString().split('T')[0]}" class="w-full rounded-xl border-none bg-slate-100 dark:bg-[#233c48] text-slate-900 dark:text-white dark:[color-scheme:dark] focus:ring-2 focus:ring-primary/50 px-4 py-3" />
+                        </div>
+                        <button class="close-date-picker w-full bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white rounded-xl py-3 font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition">Close</button>
+                    </div>
+                `;
+                document.body.appendChild(dateModal);
+
+                dateModal.querySelectorAll('.quick-date').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const offset = parseInt(btn.dataset.offset);
+                        const newDate = new Date();
+                        newDate.setDate(newDate.getDate() + offset);
+                        selectedDate = newDate;
+                        sessionDateInput.value = selectedDate.toISOString().split('T')[0];
+                        sessionDateDisplay.textContent = selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        dateModal.remove();
+                    });
+                });
+
+                dateModal.querySelector('#customDatePicker').addEventListener('change', (e) => {
+                    selectedDate = new Date(e.target.value + 'T00:00:00');
+                    sessionDateInput.value = selectedDate.toISOString().split('T')[0];
+                    sessionDateDisplay.textContent = selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    dateModal.remove();
+                });
+
+                dateModal.querySelector('.close-date-picker').addEventListener('click', () => dateModal.remove());
+                dateModal.addEventListener('click', (e) => { if (e.target === dateModal) dateModal.remove(); });
+            });
+
+            modal.querySelector('#saveNewSession').addEventListener('click', async () => {
+                const name = modal.querySelector('#sessionName').value.trim() || 'Work Session';
+                const hours = parseFloat(modal.querySelector('#sessionHours').value) || 0;
+                const date = modal.querySelector('#sessionDate').value;
+
+                if (hours <= 0) {
+                    showToast('Please enter valid hours', 'warning');
+                    return;
+                }
+
+                const result = await window.api.saveSession({
+                    name,
+                    duration: Math.floor(hours * 3600),
+                    date
+                });
+
+                if (result.success) {
+                    modal.remove();
+                    loadHistory();
+                } else {
+                    showToast('Error: ' + result.error, 'error');
+                }
+            });
+
+            modal.querySelector('.close-add-modal').addEventListener('click', () => modal.remove());
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+        });
+
+        // Load history on page load
+        loadHistory();
+    </script>
+</body>
+
+</html>
