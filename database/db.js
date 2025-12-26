@@ -1,5 +1,5 @@
 // database/db.js
-// SQLite database management for Workflow Timer
+// SQLite database management for Workflow
 
 const Database = require('better-sqlite3');
 const path = require('path');

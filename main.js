@@ -20,7 +20,7 @@ function createWindow() {
         frame: false, // Frameless window for modern look
         autoHideMenuBar: true,
         backgroundColor: '#101c22',
-        title: 'Workflow Timer',
+        title: 'Workflow',
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,

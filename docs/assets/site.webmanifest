@@ -1,5 +1,5 @@
 {
-  "name": "Welcome to Workflow",
+  "name": "Workflow",
   "short_name": "Workflow",
   "icons": [
     {
@@ -15,7 +15,7 @@
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff",
+  "theme_color": "#9a7ea3",
+  "background_color": "#2c254a",
   "display": "standalone"
 }

@@ -1,8 +1,8 @@
-# Workflow Timer ⏱️
+# Workflow ⏱️
 
 <div align="center">
 
-![Workflow Timer Logo](assets/workflow-timer.png)
+<img src="assets/banner.png" alt="Workflow Logo" />
 
 **Modern work time tracking desktop application**
 
@@ -18,7 +18,7 @@
 
 ## 📋 Overview
 
-Workflow Timer is a beautiful, minimalist desktop application for tracking your work hours. Built with Electron and SQLite, it helps you stay motivated with streak tracking, daily targets, and detailed work session history.
+Workflow is a beautiful, minimalist desktop application for tracking your work hours. Built with Electron and SQLite, it helps you stay motivated with streak tracking, daily targets, and detailed work session history.
 
 ## ✨ Features
 
@@ -172,7 +172,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👨‍💻 Author
 
-**Workflow Timer Team**
+**Workflow Team**
 - Website: [fleizean.dev](https://www.fleizean.dev)
 
 ## 🙏 Acknowledgments
@@ -185,7 +185,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-Made with ❤️ and ⏱️ by Workflow Timer Team
+Made with ❤️ and ⏱️ by Workflow Team
 
 [⬆ Back to Top](#workflow-timer-️)
 

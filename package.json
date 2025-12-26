@@ -1,7 +1,7 @@
 {
     "name": "workflow-timer",
     "version": "1.1.0",
-    "description": "Workflow Timer - Modern work tracking desktop application",
+    "description": "Workflow - Modern work tracking desktop application",
     "main": "main.js",
     "scripts": {
         "start": "electron . --no-sandbox",
@@ -36,7 +36,7 @@
     },
     "build": {
         "appId": "com.workflow.timer",
-        "productName": "Workflow Timer",
+        "productName": "Workflow",
         "win": {
             "target": "nsis",
             "icon": "build/icon.png"

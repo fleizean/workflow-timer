@@ -1,6 +1,6 @@
-# Contributing to Workflow Timer
+# Contributing to Workflow
 
-First off, thank you for considering contributing to Workflow Timer! 🎉
+First off, thank you for considering contributing to Workflow! 🎉
 
 ## How Can I Contribute?
 

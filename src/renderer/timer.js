@@ -1,5 +1,5 @@
 // renderer/timer.js
-// Timer logic for Workflow Timer
+// Timer logic for Workflow
 
 class WorkTimer {
     constructor() {
