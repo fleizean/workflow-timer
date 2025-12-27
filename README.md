@@ -148,6 +148,15 @@ npm run build:dir  # Build unpacked directory
 - Weekends are included in the streak calculation
 - Missing a day resets your streak to 0
 
+### Troubleshooting
+
+#### macOS: "App is damaged" or "Cannot be opened"
+If you see an error saying the app is damaged or cannot be opened, run this command in Terminal:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/Workflow.app
+```
+
 ### Viewing History
 
 1. Click on the **Logged** card on the main screen
