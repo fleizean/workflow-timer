@@ -1,10 +1,11 @@
 {
     "name": "workflow-timer",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "description": "Workflow - Modern work tracking desktop application",
     "main": "main.js",
     "scripts": {
         "start": "electron . --no-sandbox",
+        "lint": "eslint .",
         "build": "electron-builder --win --publish never",
         "build:mac": "electron-builder --mac --publish never",
         "build:all": "electron-builder --win --mac --publish never",
@@ -27,9 +28,12 @@
     },
     "homepage": "https://github.com/fleizean/workflow-timer#readme",
     "devDependencies": {
+        "@eslint/js": "^9.39.2",
         "electron": "^28.0.0",
         "electron-builder": "^24.13.3",
-        "electron-rebuild": "^3.2.9"
+        "electron-rebuild": "^3.2.9",
+        "eslint": "^9.39.2",
+        "globals": "^16.5.0"
     },
     "dependencies": {
         "better-sqlite3": "^9.2.2"

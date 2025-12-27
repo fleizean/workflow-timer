@@ -29,10 +29,23 @@ Feature suggestions are welcome! Please:
 1. Fork the repo and create your branch from `main`
 2. Make your changes
 3. Test your changes thoroughly
-4. Update the README.md if needed
-5. Ensure your code follows the existing style
-6. Write clear commit messages
-7. Submit a pull request!
+4. Run `npm run lint` and ensure there are no errors
+5. Update the README.md if needed
+6. Ensure your code follows the existing style
+7. Write clear commit messages
+8. Submit a pull request!
+
+### Pull Request Checklist
+
+Please copy and paste this checklist into your Pull Request description and mark the items you have completed:
+
+```markdown
+## Checklist
+- [ ] My code passes `npm run lint` without errors
+- [ ] I have tested the changes locally
+- [ ] I have updated the documentation (if applicable)
+- [ ] I have added appropriate comments for complex logic
+```
 
 ## Development Setup
 
@@ -73,6 +86,16 @@ Before submitting:
 - Test on different screen sizes
 - Check for console errors
 - Verify database operations work correctly
+
+## Linting
+
+Your code **must** pass ESLint checks before it can be merged. Run the following command to check your code:
+
+```bash
+npm run lint
+```
+
+If there are errors, please fix them before submitting your Pull Request.
 
 ## Questions?
 

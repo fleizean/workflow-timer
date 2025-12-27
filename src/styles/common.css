@@ -19,9 +19,15 @@
     scrollbar-width: none;
 }
 
-/* Body Minimum Height */
+/* Body Layout */
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden; /* Prevent body scroll, let app-container handle it */
+}
+
 body {
-    min-height: max(884px, 100dvh);
+    height: 100vh; /* Fallback */
 }
 
 /* Hide Number Input Arrows */

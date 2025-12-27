@@ -36,8 +36,7 @@
 
 <body
     class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-white antialiased selection:bg-primary selection:text-white">
-    <div
-        class="app-container relative flex h-full min-h-screen w-full flex-col overflow-x-hidden max-w-md mx-auto shadow-2xl">
+    <div class="app-container relative flex h-full w-full flex-col overflow-hidden max-w-md mx-auto shadow-2xl">
         <!-- TopAppBar -->
         <header class="flex items-center p-6 justify-between z-10">
             <button id="datePickerBtn"
@@ -53,7 +52,7 @@
             </button>
         </header>
         <!-- Main Content Area -->
-        <main class="flex-1 flex flex-col px-6 pb-6 gap-8">
+        <main class="flex-1 flex flex-col px-6 pb-6 gap-4 overflow-y-auto no-scrollbar">
             <!-- Stats Cards -->
             <div class="grid grid-cols-3 gap-3">
                 <div
@@ -99,12 +98,12 @@
                 </div>
             </div>
             <!-- Main Timer Display -->
-            <div class="flex-1 flex flex-col items-center justify-center relative min-h-[320px]">
+            <div class="flex-1 flex flex-col items-center justify-center relative min-h-[250px] shrink-0">
                 <!-- Headline Text -->
                 <h3 class="text-slate-400 dark:text-slate-500 text-sm font-bold uppercase tracking-[0.2em] mb-8">
                     Remaining</h3>
                 <!-- Circular Progress Timer -->
-                <div class="relative w-72 h-72 flex items-center justify-center">
+                <div class="relative w-full max-w-[280px] aspect-square flex items-center justify-center">
                     <svg class="absolute w-full h-full transform -rotate-90" viewBox="0 0 100 100">
 
                         <circle class="text-slate-200 dark:text-white/5" cx="50" cy="50" fill="none" r="45"
@@ -140,7 +139,7 @@
                 </div>
                 <!-- Meta Text -->
                 <div
-                    class="text-slate-400 dark:text-[#92b7c9] text-sm font-medium mt-8 flex flex-col items-center gap-1 bg-slate-100 dark:bg-surface-dark px-4 py-3 rounded-full">
+                    class="text-slate-400 dark:text-[#92b7c9] text-sm font-medium mt-6 flex flex-col items-center gap-1 bg-slate-100 dark:bg-surface-dark px-4 py-3 rounded-full">
                     <div class="flex items-center gap-2">
                         <span class="material-symbols-outlined text-sm">schedule</span>
                         <span id="finishTimeText">Not running</span>

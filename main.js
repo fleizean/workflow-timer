@@ -391,8 +391,11 @@ ipcMain.handle('export-day-end', async () => {
 
         // Prepare entries for Google Sheets
         const entries = [];
+        // Helper to aggregate notes by column
+        const notesByColumn = {};
+
         exportData.forEach(item => {
-            // Add hours entry
+            // Add hours entry (keep separate per company)
             if (item.excelColumn) {
                 entries.push({
                     column: item.excelColumn.toUpperCase().replace(/[0-9]/g, ''), // Remove any numbers, keep only letters
@@ -401,40 +404,38 @@ ipcMain.handle('export-day-end', async () => {
                     company: item.companyName
                 });
             }
-            // Add notes entry
-            if (item.noteColumn) {
-                entries.push({
-                    column: item.noteColumn.toUpperCase().replace(/[0-9]/g, ''), // Remove any numbers
-                    value: item.notes,
-                    type: 'note',
-                    company: item.companyName
-                });
+
+            // Collect notes for aggregation
+            if (item.noteColumn && item.notes) {
+                const col = item.noteColumn.toUpperCase().replace(/[0-9]/g, '');
+                if (!notesByColumn[col]) {
+                    notesByColumn[col] = [];
+                }
+                // Optional: You could prefix with company name here if desired, e.g. `${item.companyName}: ${item.notes}`
+                // For now, adhering to user request of simple joining
+                notesByColumn[col].push(item.notes);
             }
         });
 
-        console.log('=== DAY END EXPORT ===');
-        console.log('Date:', getLocalDate());
-        const now = new Date();
-        console.log('Row:', now.getDate() + 1);
-        exportData.forEach(item => {
-            console.log(`Company: ${item.companyName}`);
-            console.log(`  Duration: ${item.duration} (${item.durationHours}h) -> Column: ${item.excelColumn || 'Not set'}`);
-            console.log(`  Note: ${item.notes} -> Column: ${item.noteColumn || 'Not set'}`);
+        // Add aggregated notes entries
+        Object.keys(notesByColumn).forEach(col => {
+            entries.push({
+                column: col,
+                value: notesByColumn[col].join(' | '), // Join with separator
+                type: 'note',
+                company: 'Combined' // Indicating this is a combined entry
+            });
         });
-        console.log('======================');
 
-        // If script URL is configured, send data to Google Sheets
-        console.log('Script URL:', scriptUrl);
-        console.log('Entries:', entries);
+
+        const now = new Date();
         if (scriptUrl && entries.length > 0) {
             const https = require('https');
-            const url = require('url');
+            // const url = require('url'); // Unused
 
             // Calculate row based on local date (Day of month + 1)
             const row = now.getDate() + 1;
             const postData = JSON.stringify({ entries, row });
-            console.log('Sending to Google Sheets:', postData);
-            console.log('Script URL:', scriptUrl);
 
             const makeRequest = (requestUrl, redirectCount = 0) => {
                 return new Promise((resolve, reject) => {
@@ -462,7 +463,6 @@ ipcMain.handle('export-day-end', async () => {
                         // Handle redirects
                         if (res.statusCode === 302 || res.statusCode === 301) {
                             const redirectUrl = res.headers.location;
-                            console.log('Redirect to:', redirectUrl);
 
                             // For GET redirects after POST
                             const getRequest = (getUrl) => {
@@ -473,7 +473,7 @@ ipcMain.handle('export-day-end', async () => {
                                         getRes.on('end', () => {
                                             try {
                                                 getResolve(JSON.parse(getData));
-                                            } catch (e) {
+                                            } catch {
                                                 // If not JSON, still consider it success
                                                 getResolve({ success: true, message: 'Request completed' });
                                             }
@@ -490,11 +490,9 @@ ipcMain.handle('export-day-end', async () => {
 
                         res.on('data', chunk => data += chunk);
                         res.on('end', () => {
-                            console.log('Response status:', res.statusCode);
-                            console.log('Response data:', data);
                             try {
                                 resolve(JSON.parse(data));
-                            } catch (e) {
+                            } catch {
                                 resolve({ success: true, message: 'Request completed', raw: data });
                             }
                         });
@@ -512,7 +510,6 @@ ipcMain.handle('export-day-end', async () => {
 
             try {
                 const result = await makeRequest(scriptUrl);
-                console.log('Google Sheets result:', result);
                 return {
                     success: true,
                     exportData,
@@ -520,7 +517,6 @@ ipcMain.handle('export-day-end', async () => {
                     googleSheets: result
                 };
             } catch (error) {
-                console.error('Google Sheets error:', error);
                 return {
                     success: true,
                     exportData,

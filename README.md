@@ -111,6 +111,14 @@ workflow-timer/
 - **[Tailwind CSS](https://tailwindcss.com/)** - Utility-first CSS framework
 - **[Material Symbols](https://fonts.google.com/icons)** - Icon library
 
+### Linting & Code Quality
+
+We use ESLint to enforce code style and catch errors. Before submitting a PR, make sure your code passes the linter:
+
+```bash
+npm run lint
+```
+
 ### Key Scripts
 
 ```bash
@@ -154,7 +162,7 @@ npm run build:dir  # Build unpacked directory
 - [ ] Pomodoro timer mode
 - [ ] Multi-language support
 - [ ] Custom themes
-- [ ] Excelsheet sync?
+- [x] Excelsheet sync
 
 ## 🤝 Contributing
 

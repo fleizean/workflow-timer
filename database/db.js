@@ -43,7 +43,7 @@ function initDatabase() {
   `);
 
     // Migration: Add company_id and note columns if they don't exist
-    const tableInfo = db.prepare("PRAGMA table_info(work_sessions)").all();
+    const tableInfo = db.prepare('PRAGMA table_info(work_sessions)').all();
     const hasCompanyId = tableInfo.some(col => col.name === 'company_id');
     const hasNote = tableInfo.some(col => col.name === 'note');
 
@@ -56,7 +56,7 @@ function initDatabase() {
     }
 
     // Migration: Add excel_column and note_column to companies table
-    const companyTableInfo = db.prepare("PRAGMA table_info(companies)").all();
+    const companyTableInfo = db.prepare('PRAGMA table_info(companies)').all();
     const hasExcelColumn = companyTableInfo.some(col => col.name === 'excel_column');
     const hasNoteColumn = companyTableInfo.some(col => col.name === 'note_column');
 
@@ -69,15 +69,15 @@ function initDatabase() {
     }
 
     // Create default "Unassigned" company if it doesn't exist
-    const defaultCompany = db.prepare("SELECT id FROM companies WHERE name = 'Unassigned'").get();
+    const defaultCompany = db.prepare('SELECT id FROM companies WHERE name = \'Unassigned\'').get();
     if (!defaultCompany) {
-        db.prepare("INSERT INTO companies (name) VALUES ('Unassigned')").run();
+        db.prepare('INSERT INTO companies (name) VALUES (\'Unassigned\')').run();
     }
 
     // Assign existing work sessions without company_id to the default company
-    const unassignedCompanyId = db.prepare("SELECT id FROM companies WHERE name = 'Unassigned'").get()?.id;
+    const unassignedCompanyId = db.prepare('SELECT id FROM companies WHERE name = \'Unassigned\'').get()?.id;
     if (unassignedCompanyId) {
-        db.prepare("UPDATE work_sessions SET company_id = ? WHERE company_id IS NULL").run(unassignedCompanyId);
+        db.prepare('UPDATE work_sessions SET company_id = ? WHERE company_id IS NULL').run(unassignedCompanyId);
     }
 
     // Settings table

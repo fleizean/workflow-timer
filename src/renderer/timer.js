@@ -1,6 +1,7 @@
 // renderer/timer.js
 // Timer logic for Workflow
 
+/* eslint-disable no-unused-vars */
 class WorkTimer {
     constructor() {
         this.running = false;

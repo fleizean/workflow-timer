@@ -19,8 +19,7 @@
 
 <body
     class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white antialiased selection:bg-primary/30">
-    <div
-        class="app-container relative flex h-full min-h-screen w-full flex-col overflow-hidden mx-auto max-w-md shadow-2xl">
+    <div class="app-container relative flex h-full w-full flex-col overflow-hidden mx-auto max-w-md shadow-2xl">
 
 
         <!-- Header -->
@@ -102,7 +101,8 @@
             <section class="mb-6">
                 <div class="mb-3 flex items-end justify-between px-1">
                     <h3 class="text-slate-900 dark:text-white text-lg font-bold leading-tight">This Week</h3>
-                    <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Oct 12 - 18</span>
+                    <span id="thisWeekDateRange"
+                        class="text-xs font-medium text-slate-500 dark:text-slate-400">Loading...</span>
                 </div>
                 <div id="thisWeekContainer" class="flex flex-col gap-3">
                     <!-- List Item 1: Over Target -->
@@ -188,7 +188,8 @@
             <section id="lastWeekSection" class="mb-6">
                 <div class="mb-3 flex items-end justify-between px-1">
                     <h3 class="text-slate-900 dark:text-white text-lg font-bold leading-tight">Last Week</h3>
-                    <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Oct 05 - 11</span>
+                    <span id="lastWeekDateRange"
+                        class="text-xs font-medium text-slate-500 dark:text-slate-400">Loading...</span>
                 </div>
                 <div id="lastWeekContainer" class="flex flex-col gap-3">
                     <!-- List Item 4 -->
@@ -516,6 +517,26 @@
                 if (changeEl) changeEl.textContent = changeText;
             }
 
+            // Update Date Ranges (This Week / Last Week)
+            const getWeekRange = (weeksAgo) => {
+                const now = new Date();
+                const start = new Date(now);
+                const day = start.getDay(); // 0=Sun, 1=Mon...
+                const diff = start.getDate() - day + (day === 0 ? -6 : 1); // Adjust to Monday
+                start.setDate(diff - (weeksAgo * 7));
+
+                const end = new Date(start);
+                end.setDate(start.getDate() + 6);
+
+                const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                return `${fmt(start)} - ${fmt(end)}`;
+            };
+
+            const thisWeekRange = document.getElementById('thisWeekDateRange');
+            const lastWeekRange = document.getElementById('lastWeekDateRange');
+            if (thisWeekRange) thisWeekRange.textContent = getWeekRange(0);
+            if (lastWeekRange) lastWeekRange.textContent = getWeekRange(1);
+
             // Determine if filters are active
             const hasActiveFilters = savedFilters.companies?.length > 0 ||
                 savedFilters.startDate ||
@@ -567,17 +588,44 @@
             // Sort groups by date descending
             const sortedGroups = Object.values(groupedByDateCompany).sort((a, b) => b.date.localeCompare(a.date));
 
+            // Calculate daily totals map
+            const dailyTotals = {};
+            sessions.forEach(session => {
+                if (!dailyTotals[session.date]) dailyTotals[session.date] = 0;
+                dailyTotals[session.date] += session.duration;
+            });
+
+            // Keep track of last rendered date for separators
+            let lastRenderedDate = null;
+
             // Render each date+company group as a summary card
             sortedGroups.forEach((group, index) => {
                 const { day, date: dateNum } = formatDateBadge(group.date);
-                const isGoal = group.totalDuration >= dailyTarget;
+                // Goal logic: Check if the DAY's total >= dailyTarget, not just this group's total
+                const dayTotal = dailyTotals[group.date] || 0;
+                const isGoal = dayTotal >= dailyTarget;
+
                 const sessionCount = group.sessions.length;
                 const groupId = `group-${index}`;
                 const hasMultipleSessions = sessionCount > 1;
                 const hasNotes = group.sessions.some(s => s.note && s.note.trim());
 
-                const cardHtml = `
+                // Separator logic: Insert if date changes (and it's not the first item)
+                let separatorHtml = '';
+                if (lastRenderedDate && lastRenderedDate !== group.date) {
+                    separatorHtml = `
+                        <div class="flex items-center gap-4 my-2 px-2 opacity-50">
+                            <div class="h-px bg-slate-300 dark:bg-slate-700 flex-1"></div>
+                            <!-- Optional: <span class="text-xs text-slate-400 font-medium">Previous Day</span> -->
+                            <div class="h-px bg-slate-300 dark:bg-slate-700 flex-1"></div>
+                        </div>
+                    `;
+                }
+                lastRenderedDate = group.date;
+
+                const cardHtml = `${separatorHtml}
       <div class="session-group-card group flex flex-col rounded-xl bg-white dark:bg-card-dark p-4 shadow-sm transition-all hover:shadow-md border border-transparent dark:border-slate-800/50 ${hasMultipleSessions ? 'cursor-pointer' : ''}" data-group-id="${groupId}">
+
         <div class="flex items-center gap-4">
           <div class="flex shrink-0 flex-col items-center justify-center rounded-lg bg-slate-100 dark:bg-[#233c48] h-14 w-14">
             <span class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400">${day}</span>
@@ -748,6 +796,28 @@
             const cancelBtn = modal.querySelector('.close-modal');
             const statusArea = modal.querySelector('#exportStatusArea');
             const actionButtons = modal.querySelector('#actionButtons');
+
+            // Validate columns
+            const invalidItems = exportData.filter(item => !item.excelColumn);
+            if (invalidItems.length > 0) {
+                confirmBtn.disabled = true;
+                confirmBtn.classList.add('opacity-50', 'cursor-not-allowed', 'grayscale');
+                confirmBtn.title = "Export disabled: Some companies are missing Excel Columns.";
+
+                const warningHtml = `
+                    <div class="p-3 rounded-xl bg-red-500/10 border border-red-500/20 mb-4 animate-in fade-in zoom-in duration-300">
+                        <p class="text-xs text-red-400 flex items-center gap-2 font-bold">
+                            <span class="material-symbols-outlined text-lg">block</span>
+                            Missing Configuration
+                        </p>
+                        <p class="text-[10px] text-red-500/70 ml-6 mt-0.5 mb-2">The following companies need an Excel Column set in 'Companies' page:</p>
+                        <ul class="list-disc list-inside text-[10px] text-red-400 ml-6">
+                            ${invalidItems.map(item => `<li>${item.companyName}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+                statusArea.innerHTML = warningHtml;
+            }
 
             // Handle Cancel
             cancelBtn.addEventListener('click', () => modal.remove());

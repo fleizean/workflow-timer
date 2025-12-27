@@ -1,14 +1,13 @@
 // src/renderer/shared.js
 // Shared utilities and loading animations
 
-/**
- * Format seconds to HHh MMm
- */
-function formatTimeShort(seconds) {
+/* eslint-disable no-unused-vars */
+// Shared utility functions for Workflow renderer
+const formatTimeShort = (seconds) => {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     return `${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m`;
-}
+};
 
 /**
  * Get day of week and date
