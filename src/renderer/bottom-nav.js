@@ -1,3 +1,5 @@
+/* global navigateWithLoading */
+
 /**
  * Bottom Navigation Component
  * Creates a mobile-style bottom navigation bar with hover effects and indicator lines

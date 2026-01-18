@@ -29,11 +29,18 @@ Workflow is a beautiful, minimalist desktop application for tracking your work h
 - **Streak Tracking**: 🔥 Monitor consecutive days of reaching your daily target
 - **Session Management**: Save, edit, and delete work sessions with custom names
 
+### 📅 Pomodoro Timer
+- **Focus Sessions**: Built-in Pomodoro timer with customizable work/break intervals
+- **Visual Progress**: Dynamic progress ring that changes color based on mode (Work/Break)
+- **Smart Notifications**: Auto-start options and sound alerts for session changes
+- **Persistence**: Timer state is saved even when you close the app or switch pages
+
 ### 🎨 Design
-- **Modern UI**: Clean, dark-mode interface with smooth animations
+- **Modern UI**: Clean, dark-mode interface with glassmorphism effects
+- **Bottom Navigation**: Sleek, mobile-style navigation with hover animations and indicator lines
 - **Frameless Window**: Custom title bar for a native app feel
 - **Responsive**: Optimized mobile-style layout (430x932px)
-- **Interactive Cards**: Hover effects and visual feedback
+- **Interactive Cards**: Hover effects, glow animations, and visual feedback
 
 ### 🔔 Notifications
 - **Goal Achievement**: Sound and visual notifications when daily target is reached
