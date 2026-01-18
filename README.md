@@ -167,7 +167,7 @@ xattr -dr com.apple.quarantine /Applications/Workflow.app
 ## 🎯 Roadmap
 
 - [ ] Statistics dashboard with charts
-- [ ] Pomodoro timer mode
+- [x] Pomodoro timer mode
 - [ ] Multi-language support
 - [ ] Custom themes
 - [x] Excelsheet sync
