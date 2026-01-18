@@ -57,7 +57,7 @@ function createWindow() {
     mainWindow.loadFile('src/pages/index.html');
 
     // Open DevTools in development (disabled for production)
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 }
 
 /**
@@ -162,9 +162,9 @@ ipcMain.handle('delete-all-sessions', async () => {
 /**
  * Create a company
  */
-ipcMain.handle('create-company', async (event, { name }) => {
+ipcMain.handle('create-company', async (event, { name, noteRequired }) => {
     try {
-        const id = db.createCompany(name);
+        const id = db.createCompany(name, noteRequired);
         return { success: true, id };
     } catch (error) {
         return { success: false, error: error.message };
@@ -198,9 +198,9 @@ ipcMain.handle('get-company', async (event, { id }) => {
 /**
  * Update a company
  */
-ipcMain.handle('update-company', async (event, { id, name, excelColumn, noteColumn }) => {
+ipcMain.handle('update-company', async (event, { id, name, excelColumn, noteColumn, noteRequired }) => {
     try {
-        const success = db.updateCompany(id, name, excelColumn, noteColumn);
+        const success = db.updateCompany(id, name, excelColumn, noteColumn, noteRequired);
         return { success };
     } catch (error) {
         return { success: false, error: error.message };
@@ -334,8 +334,10 @@ ipcMain.handle('get-todays-sessions-summary', async () => {
 /**
  * Helper: Prepare export data
  */
-function prepareExportData() {
-    const summary = db.getTodaysSessionsSummary();
+function prepareExportData(date = null) {
+    // Use provided date or default to today
+    const targetDate = date || getLocalDate();
+    const summary = db.getSessionsSummaryByDate(targetDate);
 
     // Format duration as decimal hours
     const formatDecimalHours = (seconds) => {
@@ -366,13 +368,14 @@ function prepareExportData() {
 /**
  * Preview day end data
  */
-ipcMain.handle('preview-day-end', async () => {
+ipcMain.handle('preview-day-end', async (event, { date } = {}) => {
     try {
-        const exportData = prepareExportData();
+        const targetDate = date || getLocalDate();
+        const exportData = prepareExportData(targetDate);
         return {
             success: true,
             exportData,
-            date: getLocalDate()
+            date: targetDate
         };
     } catch (error) {
         return { success: false, error: error.message };
@@ -382,9 +385,10 @@ ipcMain.handle('preview-day-end', async () => {
 /**
  * Export day end - sends data to Google Sheets via Apps Script
  */
-ipcMain.handle('export-day-end', async () => {
+ipcMain.handle('export-day-end', async (event, { date } = {}) => {
     try {
-        const exportData = prepareExportData();
+        const targetDate = date || getLocalDate();
+        const exportData = prepareExportData(targetDate);
 
         // Get script URL from settings
         const scriptUrl = db.getSetting('script_url');
@@ -428,7 +432,7 @@ ipcMain.handle('export-day-end', async () => {
         });
 
 
-        const now = new Date();
+        const now = new Date(targetDate + 'T00:00:00');
         if (scriptUrl && entries.length > 0) {
             const https = require('https');
             // const url = require('url'); // Unused
@@ -513,14 +517,16 @@ ipcMain.handle('export-day-end', async () => {
                 return {
                     success: true,
                     exportData,
-                    date: getLocalDate(),
+                    date: targetDate,
+                    row,
                     googleSheets: result
                 };
             } catch (error) {
                 return {
                     success: true,
                     exportData,
-                    date: getLocalDate(),
+                    date: targetDate,
+                    row,
                     googleSheets: { success: false, error: error.message }
                 };
             }
@@ -529,7 +535,7 @@ ipcMain.handle('export-day-end', async () => {
         return {
             success: true,
             exportData,
-            date: getLocalDate(),
+            date: targetDate,
             googleSheets: scriptUrl ? null : { success: false, error: 'Script URL not configured' }
         };
     } catch (error) {

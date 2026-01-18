@@ -166,7 +166,6 @@ xattr -dr com.apple.quarantine /Applications/Workflow.app
 
 ## 🎯 Roadmap
 
-- [ ] Export data to CSV/JSON
 - [ ] Statistics dashboard with charts
 - [ ] Pomodoro timer mode
 - [ ] Multi-language support

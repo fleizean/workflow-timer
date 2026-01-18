@@ -59,6 +59,7 @@ function initDatabase() {
     const companyTableInfo = db.prepare('PRAGMA table_info(companies)').all();
     const hasExcelColumn = companyTableInfo.some(col => col.name === 'excel_column');
     const hasNoteColumn = companyTableInfo.some(col => col.name === 'note_column');
+    const hasNoteRequired = companyTableInfo.some(col => col.name === 'note_required');
 
     if (!hasExcelColumn) {
         db.exec('ALTER TABLE companies ADD COLUMN excel_column TEXT');
@@ -66,6 +67,10 @@ function initDatabase() {
 
     if (!hasNoteColumn) {
         db.exec('ALTER TABLE companies ADD COLUMN note_column TEXT');
+    }
+
+    if (!hasNoteRequired) {
+        db.exec('ALTER TABLE companies ADD COLUMN note_required INTEGER DEFAULT 0');
     }
 
     // Create default "Unassigned" company if it doesn't exist
@@ -88,12 +93,33 @@ function initDatabase() {
     )
   `);
 
+    // Pomodoro sessions table for tracking completed Pomodoros
+    db.exec(`
+    CREATE TABLE IF NOT EXISTS pomodoro_sessions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      date TEXT NOT NULL,
+      company_id INTEGER,
+      pomodoros_completed INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+    )
+  `);
+
     // Initialize default settings
     const defaultSettings = {
         daily_target: '28800', // 8 hours in seconds
         goal_notification: 'true',
         start_reminder: 'false',
-        haptic_feedback: 'true'
+        haptic_feedback: 'true',
+        exclude_weekends_from_streak: 'false',
+        // Pomodoro settings
+        pomodoro_enabled: 'false',
+        pomodoro_work_duration: '1500', // 25 minutes in seconds
+        pomodoro_short_break: '300', // 5 minutes in seconds
+        pomodoro_long_break: '900', // 15 minutes in seconds
+        pomodoro_sessions_until_long_break: '4',
+        pomodoro_auto_start_breaks: 'true',
+        pomodoro_auto_start_work: 'false'
     };
 
     const insertSetting = db.prepare('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)');
@@ -157,9 +183,9 @@ function deleteAllSessions() {
 /**
  * Create a new company
  */
-function createCompany(name) {
-    const stmt = db.prepare('INSERT INTO companies (name) VALUES (?)');
-    const result = stmt.run(name);
+function createCompany(name, noteRequired = false) {
+    const stmt = db.prepare('INSERT INTO companies (name, note_required) VALUES (?, ?)');
+    const result = stmt.run(name, noteRequired ? 1 : 0);
     return result.lastInsertRowid;
 }
 
@@ -182,9 +208,9 @@ function getCompany(id) {
 /**
  * Update a company
  */
-function updateCompany(id, name, excelColumn = null, noteColumn = null) {
-    const stmt = db.prepare('UPDATE companies SET name = ?, excel_column = ?, note_column = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
-    const result = stmt.run(name, excelColumn, noteColumn, id);
+function updateCompany(id, name, excelColumn = null, noteColumn = null, noteRequired = false) {
+    const stmt = db.prepare('UPDATE companies SET name = ?, excel_column = ?, note_column = ?, note_required = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
+    const result = stmt.run(name, excelColumn, noteColumn, noteRequired ? 1 : 0, id);
     return result.changes > 0;
 }
 
@@ -247,6 +273,27 @@ function getTodaysSessionsSummary() {
         ORDER BY c.name ASC
     `);
     return stmt.all(today);
+}
+
+/**
+ * Get sessions summary for a specific date (for export)
+ */
+function getSessionsSummaryByDate(date) {
+    const stmt = db.prepare(`
+        SELECT 
+            c.id as company_id,
+            c.name as company_name,
+            c.excel_column,
+            c.note_column,
+            SUM(ws.duration) as total_duration,
+            GROUP_CONCAT(ws.note, ' | ') as combined_notes
+        FROM work_sessions ws
+        LEFT JOIN companies c ON ws.company_id = c.id
+        WHERE ws.date = ?
+        GROUP BY ws.company_id
+        ORDER BY c.name ASC
+    `);
+    return stmt.all(date);
 }
 
 /**
@@ -366,6 +413,13 @@ function getLastWeekTotal() {
  */
 function calculateCurrentStreak() {
     const dailyTarget = parseInt(getSetting('daily_target') || '28800');
+    const excludeWeekends = getSetting('exclude_weekends_from_streak') === 'true';
+
+    // Helper function to check if a date is a weekend
+    const isWeekend = (date) => {
+        const day = date.getDay();
+        return day === 0 || day === 6; // Sunday = 0, Saturday = 6
+    };
 
     // Get all sessions grouped by date, ordered from most recent
     const stmt = db.prepare(`
@@ -397,6 +451,12 @@ function calculateCurrentStreak() {
 
     // Count backwards to find consecutive days with target reached
     while (true) {
+        // Skip weekends if the setting is enabled
+        if (excludeWeekends && isWeekend(checkDate)) {
+            checkDate.setDate(checkDate.getDate() - 1);
+            continue;
+        }
+
         const dateStr = formatLocalDate(checkDate);
         const dayData = dailyTotals.find(d => d.date === dateStr);
 
@@ -416,6 +476,66 @@ function calculateCurrentStreak() {
     }
 
     return streak;
+}
+
+/**
+ * Pomodoro Functions
+ */
+
+/**
+ * Save a completed Pomodoro
+ */
+function savePomodoroCompletion(date, companyId = null) {
+    const stmt = db.prepare('INSERT INTO pomodoro_sessions (date, company_id, pomodoros_completed) VALUES (?, ?, 1)');
+    const result = stmt.run(date, companyId);
+    return result.lastInsertRowid;
+}
+
+/**
+ * Get today's total Pomodoro count
+ */
+function getTodayPomodoroCount() {
+    const today = formatLocalDate(new Date());
+    const stmt = db.prepare('SELECT SUM(pomodoros_completed) as total FROM pomodoro_sessions WHERE date = ?');
+    const result = stmt.get(today);
+    return result?.total || 0;
+}
+
+/**
+ * Get Pomodoro stats for a specific date
+ */
+function getPomodoroStatsByDate(date) {
+    const stmt = db.prepare(`
+        SELECT 
+            c.name as company_name,
+            SUM(ps.pomodoros_completed) as pomodoros
+        FROM pomodoro_sessions ps
+        LEFT JOIN companies c ON ps.company_id = c.id
+        WHERE ps.date = ?
+        GROUP BY ps.company_id
+        ORDER BY pomodoros DESC
+    `);
+    return stmt.all(date);
+}
+
+/**
+ * Get weekly Pomodoro stats
+ */
+function getWeeklyPomodoroStats() {
+    const today = new Date();
+    const weekAgo = new Date(today);
+    weekAgo.setDate(weekAgo.getDate() - 7);
+
+    const stmt = db.prepare(`
+        SELECT 
+            date,
+            SUM(pomodoros_completed) as total
+        FROM pomodoro_sessions
+        WHERE date >= ? AND date <= ?
+        GROUP BY date
+        ORDER BY date ASC
+    `);
+    return stmt.all(formatLocalDate(weekAgo), formatLocalDate(today));
 }
 
 module.exports = {
@@ -442,5 +562,11 @@ module.exports = {
     getSessionsByDateAndCompany,
     // Export functions
     getTodaySessions,
-    getTodaysSessionsSummary
+    getTodaysSessionsSummary,
+    getSessionsSummaryByDate,
+    // Pomodoro functions
+    savePomodoroCompletion,
+    getTodayPomodoroCount,
+    getPomodoroStatsByDate,
+    getWeeklyPomodoroStats
 };

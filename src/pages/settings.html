@@ -20,12 +20,12 @@
 <body
     class="bg-background-light dark:bg-background-dark font-display antialiased text-slate-900 dark:text-white overflow-x-hidden selection:bg-primary/30">
     <div
-        class="app-container relative flex h-full w-full flex-col max-w-md mx-auto border-x border-white/5 shadow-2xl overflow-hidden">
+        class="app-container relative flex h-screen w-full flex-col max-w-md mx-auto border-x border-white/5 shadow-2xl overflow-hidden">
 
 
         <!-- Header -->
         <header
-            class="sticky top-0 z-20 flex items-center justify-between bg-background-light/95 dark:bg-background-dark/95 px-4 pt-4 pb-4 backdrop-blur-md transition-colors duration-300">
+            class="shrink-0 flex items-center justify-between bg-background-light/95 dark:bg-background-dark/95 px-4 pt-4 pb-4 backdrop-blur-md transition-colors duration-300">
             <button
                 class="flex items-center justify-center w-10 h-10 -ml-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
                 id="backButton">
@@ -35,7 +35,7 @@
             <div class="w-10"></div>
         </header>
         <!-- Content Scroll Area -->
-        <main class="flex-1 flex flex-col px-4 pb-24 pt-2 overflow-y-auto no-scrollbar">
+        <main class="flex-1 flex flex-col px-4 pt-2 pb-32 overflow-y-auto">
             <!-- Section: Work Preferences -->
             <div class="mt-6 mb-2">
                 <h3 class="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider px-1 mb-2">
@@ -60,6 +60,33 @@
                             <p class="text-slate-500 dark:text-[#92b7c9] text-xs mt-2 pl-1">Standard 8-hour work day is
                                 default.</p>
                         </label>
+                    </div>
+                    <!-- Weekend Exclusion Toggle -->
+                    <div
+                        class="bg-white dark:bg-surface-dark rounded-2xl p-4 shadow-sm border border-black/5 dark:border-white/5">
+                        <div class="flex items-center gap-4 justify-between">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="flex items-center justify-center w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400">
+                                    <span class="material-symbols-outlined text-[20px]">event_busy</span>
+                                </div>
+                                <div class="flex flex-col justify-center">
+                                    <p class="text-slate-900 dark:text-white text-base font-medium leading-normal">
+                                        Exclude Weekends</p>
+                                    <p class="text-slate-500 dark:text-[#92b7c9] text-xs">Only count Mon-Fri for streak
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="shrink-0">
+                                <label
+                                    class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-slate-200 dark:bg-[#233c48] p-0.5 has-[:checked]:justify-end has-[:checked]:bg-primary transition-colors duration-200">
+                                    <div
+                                        class="h-[27px] w-[27px] rounded-full bg-white shadow-sm transform transition-transform duration-200">
+                                    </div>
+                                    <input id="excludeWeekendsToggle" class="peer sr-only" type="checkbox" />
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -89,6 +116,148 @@
                                     class="h-[27px] w-[27px] rounded-full bg-white shadow-sm transform transition-transform duration-200">
                                 </div>
                                 <input checked="" class="peer sr-only" type="checkbox" />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 mb-2">
+                <h3 class="text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider px-1 mb-2">
+                    Pomodoro Timer 🍅</h3>
+                <div
+                    class="bg-white dark:bg-surface-dark rounded-2xl overflow-hidden shadow-sm border border-black/5 dark:border-white/5 divide-y divide-slate-100 dark:divide-white/5">
+                    <!-- Enable Pomodoro Mode -->
+                    <div
+                        class="flex items-center gap-4 px-4 py-4 justify-between hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer group">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="flex items-center justify-center w-8 h-8 rounded-full bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400">
+                                <span class="material-symbols-outlined text-[20px]">timer</span>
+                            </div>
+                            <div class="flex flex-col justify-center">
+                                <p class="text-slate-900 dark:text-white text-base font-medium leading-normal">Enable
+                                    Pomodoro
+                                    Mode</p>
+                                <p class="text-slate-500 dark:text-[#92b7c9] text-xs">Use 25/5 work/break intervals</p>
+                            </div>
+                        </div>
+                        <div class="shrink-0">
+                            <label
+                                class="relative flex h-[31px] w-[51px] cursor-pointer items-center rounded-full border-none bg-slate-200 dark:bg-[#233c48] p-0.5 has-[:checked]:justify-end has-[:checked]:bg-primary transition-colors duration-200">
+                                <div
+                                    class="h-[27px] w-[27px] rounded-full bg-white shadow-sm transform transition-transform duration-200">
+                                </div>
+                                <input id="pomodoroEnabledToggle" class="peer sr-only" type="checkbox" />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pomodoro Duration Settings (shown when enabled) -->
+                <div id="pomodoroDurationSettings" class="mt-3 space-y-3 hidden">
+                    <!-- Work Duration -->
+                    <div
+                        class="bg-white dark:bg-surface-dark rounded-2xl p-4 shadow-sm border border-black/5 dark:border-white/5">
+                        <label class="flex flex-col w-full">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary text-lg">work</span>
+                                    <p class="text-slate-900 dark:text-white text-sm font-medium">Work Duration</p>
+                                </div>
+                                <span id="workDurationDisplay"
+                                    class="text-xs text-slate-500 dark:text-slate-400 font-semibold">25 min</span>
+                            </div>
+                            <input type="number" id="pomodoroWorkDuration" min="1" max="60" value="25"
+                                class="form-input block w-full rounded-xl border-none bg-slate-100 dark:bg-[#233c48] text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 h-12 px-4 text-base font-medium shadow-inner" />
+                            <p class="text-slate-500 dark:text-[#92b7c9] text-xs mt-2 pl-1">Minutes per work session</p>
+                        </label>
+                    </div>
+
+                    <!-- Short Break -->
+                    <div
+                        class="bg-white dark:bg-surface-dark rounded-2xl p-4 shadow-sm border border-black/5 dark:border-white/5">
+                        <label class="flex flex-col w-full">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary text-lg">coffee</span>
+                                    <p class="text-slate-900 dark:text-white text-sm font-medium">Short Break</p>
+                                </div>
+                                <span id="shortBreakDisplay"
+                                    class="text-xs text-slate-500 dark:text-slate-400 font-semibold">5
+                                    min</span>
+                            </div>
+                            <input type="number" id="pomodoroShortBreak" min="1" max="30" value="5"
+                                class="form-input block w-full rounded-xl border-none bg-slate-100 dark:bg-[#233c48] text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 h-12 px-4 text-base font-medium shadow-inner" />
+                            <p class="text-slate-500 dark:text-[#92b7c9] text-xs mt-2 pl-1">Minutes for short breaks</p>
+                        </label>
+                    </div>
+
+                    <!-- Long Break -->
+                    <div
+                        class="bg-white dark:bg-surface-dark rounded-2xl p-4 shadow-sm border border-black/5 dark:border-white/5">
+                        <label class="flex flex-col w-full">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary text-lg">beach_access</span>
+                                    <p class="text-slate-900 dark:text-white text-sm font-medium">Long Break</p>
+                                </div>
+                                <span id="longBreakDisplay"
+                                    class="text-xs text-slate-500 dark:text-slate-400 font-semibold">15
+                                    min</span>
+                            </div>
+                            <input type="number" id="pomodoroLongBreak" min="5" max="60" value="15"
+                                class="form-input block w-full rounded-xl border-none bg-slate-100 dark:bg-[#233c48] text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 h-12 px-4 text-base font-medium shadow-inner" />
+                            <p class="text-slate-500 dark:text-[#92b7c9] text-xs mt-2 pl-1">Minutes for long breaks</p>
+                        </label>
+                    </div>
+
+                    <!-- Sessions Until Long Break -->
+                    <div
+                        class="bg-white dark:bg-surface-dark rounded-2xl p-4 shadow-sm border border-black/5 dark:border-white/5">
+                        <label class="flex flex-col w-full">
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary text-lg">repeat</span>
+                                    <p class="text-slate-900 dark:text-white text-sm font-medium">Pomodoros Until Long
+                                        Break</p>
+                                </div>
+                                <span id="sessionsDisplay"
+                                    class="text-xs text-slate-500 dark:text-slate-400 font-semibold">4</span>
+                            </div>
+                            <input type="number" id="pomodoroSessionsUntilLongBreak" min="2" max="10" value="4"
+                                class="form-input block w-full rounded-xl border-none bg-slate-100 dark:bg-[#233c48] text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/50 h-12 px-4 text-base font-medium shadow-inner" />
+                            <p class="text-slate-500 dark:text-[#92b7c9] text-xs mt-2 pl-1">Number of work sessions
+                                before long
+                                break</p>
+                        </label>
+                    </div>
+
+                    <!-- Auto-start Options -->
+                    <div
+                        class="bg-white dark:bg-surface-dark rounded-2xl p-4 shadow-sm border border-black/5 dark:border-white/5">
+                        <div class="space-y-3">
+                            <label
+                                class="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                <input type="checkbox" id="pomodoroAutoStartBreaks" checked
+                                    class="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary/50 focus:ring-2 bg-slate-100 dark:bg-[#233c48]">
+                                <div class="flex-1">
+                                    <p class="text-sm text-slate-900 dark:text-white font-medium">Auto-start Breaks</p>
+                                    <p class="text-xs text-slate-500 dark:text-[#92b7c9]">Automatically start break
+                                        after work
+                                        session</p>
+                                </div>
+                            </label>
+                            <label
+                                class="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                                <input type="checkbox" id="pomodoroAutoStartWork"
+                                    class="w-4 h-4 rounded border-gray-600 text-primary focus:ring-primary/50 focus:ring-2 bg-slate-100 dark:bg-[#233c48]">
+                                <div class="flex-1">
+                                    <p class="text-sm text-slate-900 dark:text-white font-medium">Auto-start Work</p>
+                                    <p class="text-xs text-slate-500 dark:text-[#92b7c9]">Automatically start work after
+                                        break
+                                    </p>
+                                </div>
                             </label>
                         </div>
                     </div>
@@ -147,6 +316,16 @@
                     </button>
                 </div>
             </div>
+
+            <!-- Save Button -->
+            <div class="mt-6 mb-4">
+                <button id="saveSettingsBtn"
+                    class="w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-[0.98] shadow-lg shadow-primary/30">
+                    <span class="material-symbols-outlined">save</span>
+                    Save Changes
+                </button>
+            </div>
+
             <!-- Danger Zone -->
             <div class="mt-8 mb-8">
                 <button
@@ -156,20 +335,22 @@
                 </button>
                 <p class="text-center text-slate-400 dark:text-slate-600 text-xs mt-4">Version 1.2.1</p>
             </div>
+
         </main>
         <!-- Sticky Save/Action Button -->
-        <div
-            class="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background-light via-background-light to-transparent dark:from-background-dark dark:via-background-dark dark:to-transparent pointer-events-none flex justify-center max-w-md mx-auto z-20 h-24 items-end">
-            <button
-                class="pointer-events-auto shadow-lg shadow-primary/30 w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-[0.98]">
-                <span class="material-symbols-outlined">save</span>
-                Save Changes
-            </button>
-        </div>
+
+    </div>
+
+    <!-- Section: Pomodoro Timer -->
+
+
+
+
     </div>
     </div>
 
     <!-- Scripts -->
+    <script src="../renderer/bottom-nav.js"></script>
     <script src="../renderer/shared.js"></script>
     <script src="../renderer/titlebar.js"></script>
     <!-- Settings JavaScript -->
@@ -217,7 +398,56 @@
                 document.querySelectorAll('input[type="checkbox"]')[0].checked = goalRes.value === 'true';
             }
 
+            const excludeWeekendsRes = await window.api.getSetting({ key: 'exclude_weekends_from_streak' });
+            if (excludeWeekendsRes.success) {
+                document.getElementById('excludeWeekendsToggle').checked = excludeWeekendsRes.value === 'true';
+            }
 
+            // Load Pomodoro settings
+            const pomodoroEnabledRes = await window.api.getSetting({ key: 'pomodoro_enabled' });
+            if (pomodoroEnabledRes.success) {
+                const enabled = pomodoroEnabledRes.value === 'true';
+                document.getElementById('pomodoroEnabledToggle').checked = enabled;
+                document.getElementById('pomodoroDurationSettings').classList.toggle('hidden', !enabled);
+            }
+
+            const workDurationRes = await window.api.getSetting({ key: 'pomodoro_work_duration' });
+            if (workDurationRes.success) {
+                const minutes = Math.floor(parseInt(workDurationRes.value) / 60);
+                document.getElementById('pomodoroWorkDuration').value = minutes;
+                document.getElementById('workDurationDisplay').textContent = `${minutes} min`;
+            }
+
+            const shortBreakRes = await window.api.getSetting({ key: 'pomodoro_short_break' });
+            if (shortBreakRes.success) {
+                const minutes = Math.floor(parseInt(shortBreakRes.value) / 60);
+                document.getElementById('pomodoroShortBreak').value = minutes;
+                document.getElementById('shortBreakDisplay').textContent = `${minutes} min`;
+            }
+
+            const longBreakRes = await window.api.getSetting({ key: 'pomodoro_long_break' });
+            if (longBreakRes.success) {
+                const minutes = Math.floor(parseInt(longBreakRes.value) / 60);
+                document.getElementById('pomodoroLongBreak').value = minutes;
+                document.getElementById('longBreakDisplay').textContent = `${minutes} min`;
+            }
+
+            const sessionsRes = await window.api.getSetting({ key: 'pomodoro_sessions_until_long_break' });
+            if (sessionsRes.success) {
+                const sessions = parseInt(sessionsRes.value);
+                document.getElementById('pomodoroSessionsUntilLongBreak').value = sessions;
+                document.getElementById('sessionsDisplay').textContent = sessions;
+            }
+
+            const autoStartBreaksRes = await window.api.getSetting({ key: 'pomodoro_auto_start_breaks' });
+            if (autoStartBreaksRes.success) {
+                document.getElementById('pomodoroAutoStartBreaks').checked = autoStartBreaksRes.value === 'true';
+            }
+
+            const autoStartWorkRes = await window.api.getSetting({ key: 'pomodoro_auto_start_work' });
+            if (autoStartWorkRes.success) {
+                document.getElementById('pomodoroAutoStartWork').checked = autoStartWorkRes.value === 'true';
+            }
 
             const scriptRes = await window.api.getSetting({ key: 'script_url' });
             if (scriptRes.success && scriptRes.value) {
@@ -234,6 +464,16 @@
 
             // Get toggle states
             const goalNotif = document.querySelectorAll('input[type="checkbox"]')[0].checked;
+            const excludeWeekends = document.getElementById('excludeWeekendsToggle').checked;
+
+            // Get Pomodoro settings
+            const pomodoroEnabled = document.getElementById('pomodoroEnabledToggle').checked;
+            const pomodoroWorkDuration = parseInt(document.getElementById('pomodoroWorkDuration').value) * 60; // Convert to seconds
+            const pomodoroShortBreak = parseInt(document.getElementById('pomodoroShortBreak').value) * 60;
+            const pomodoroLongBreak = parseInt(document.getElementById('pomodoroLongBreak').value) * 60;
+            const pomodoroSessions = parseInt(document.getElementById('pomodoroSessionsUntilLongBreak').value);
+            const pomodoroAutoStartBreaks = document.getElementById('pomodoroAutoStartBreaks').checked;
+            const pomodoroAutoStartWork = document.getElementById('pomodoroAutoStartWork').checked;
 
             // Get timesheet integration values
             const scriptUrl = document.getElementById('scriptUrl').value.trim();
@@ -241,6 +481,16 @@
             // Save all settings
             await window.api.setSetting({ key: 'daily_target', value: String(dailyTargetSeconds) });
             await window.api.setSetting({ key: 'goal_notification', value: goalNotif ? 'true' : 'false' });
+            await window.api.setSetting({ key: 'exclude_weekends_from_streak', value: excludeWeekends ? 'true' : 'false' });
+
+            // Save Pomodoro settings
+            await window.api.setSetting({ key: 'pomodoro_enabled', value: pomodoroEnabled ? 'true' : 'false' });
+            await window.api.setSetting({ key: 'pomodoro_work_duration', value: String(pomodoroWorkDuration) });
+            await window.api.setSetting({ key: 'pomodoro_short_break', value: String(pomodoroShortBreak) });
+            await window.api.setSetting({ key: 'pomodoro_long_break', value: String(pomodoroLongBreak) });
+            await window.api.setSetting({ key: 'pomodoro_sessions_until_long_break', value: String(pomodoroSessions) });
+            await window.api.setSetting({ key: 'pomodoro_auto_start_breaks', value: pomodoroAutoStartBreaks ? 'true' : 'false' });
+            await window.api.setSetting({ key: 'pomodoro_auto_start_work', value: pomodoroAutoStartWork ? 'true' : 'false' });
 
             await window.api.setSetting({ key: 'script_url', value: scriptUrl });
 
@@ -378,7 +628,7 @@
             window.open('https://github.com/fleizean/workflow-timer', '_blank');
         });
 
-        document.querySelector('.fixed.bottom-0 button').addEventListener('click', saveSettings);
+        document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
 
         document.querySelector('.mt-8.mb-8 button').addEventListener('click', resetAllData);
 
@@ -440,6 +690,30 @@
 
             modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+        });
+
+        // Pomodoro toggle - show/hide duration settings
+        document.getElementById('pomodoroEnabledToggle').addEventListener('change', (e) => {
+            const enabled = e.target.checked;
+            document.getElementById('pomodoroDurationSettings').classList.toggle('hidden', !enabled);
+            saveSettings();
+        });
+
+        // Pomodoro duration inputs - update displays
+        document.getElementById('pomodoroWorkDuration').addEventListener('input', (e) => {
+            document.getElementById('workDurationDisplay').textContent = `${e.target.value} min`;
+        });
+
+        document.getElementById('pomodoroShortBreak').addEventListener('input', (e) => {
+            document.getElementById('shortBreakDisplay').textContent = `${e.target.value} min`;
+        });
+
+        document.getElementById('pomodoroLongBreak').addEventListener('input', (e) => {
+            document.getElementById('longBreakDisplay').textContent = `${e.target.value} min`;
+        });
+
+        document.getElementById('pomodoroSessionsUntilLongBreak').addEventListener('input', (e) => {
+            document.getElementById('sessionsDisplay').textContent = e.target.value;
         });
 
         // Load settings on init

@@ -19,12 +19,12 @@
 
 <body
     class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white antialiased selection:bg-primary/30">
-    <div class="app-container relative flex h-full w-full flex-col overflow-hidden mx-auto max-w-md shadow-2xl">
+    <div class="app-container relative flex h-screen w-full flex-col overflow-hidden mx-auto max-w-md shadow-2xl">
 
 
         <!-- Header -->
         <header
-            class="sticky top-0 z-20 flex items-center justify-between bg-background-light/95 dark:bg-background-dark/95 px-4 pt-4 pb-4 backdrop-blur-md transition-colors duration-300">
+            class="shrink-0 flex items-center justify-between bg-background-light/95 dark:bg-background-dark/95 px-4 pt-4 pb-4 backdrop-blur-md transition-colors duration-300">
             <button
                 class="flex items-center justify-center w-10 h-10 -ml-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
                 id="backButton">
@@ -39,7 +39,7 @@
             </div>
         </header>
         <!-- Main Content (Scrollable) -->
-        <main class="flex-1 overflow-y-auto no-scrollbar px-4 pb-24">
+        <main class="flex-1 overflow-y-auto px-4 pb-32">
             <!-- Summary Stats -->
             <section class="mt-2 mb-6">
                 <div
@@ -243,12 +243,13 @@
         </main>
         <!-- Floating Action Button -->
         <button id="addSessionFAB"
-            class="fixed bottom-6 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-xl shadow-primary/30 transition-transform hover:scale-110 active:scale-95">
+            class="fixed bottom-28 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-xl shadow-primary/30 transition-transform hover:scale-110 active:scale-95">
             <span class="material-symbols-outlined text-[28px]">add</span>
         </button>
     </div>
 
     <!-- Scripts -->
+    <script src="../renderer/bottom-nav.js"></script>
     <script src="../renderer/shared.js"></script>
     <script src="../renderer/titlebar.js"></script>
     <script src="../renderer/timer.js"></script>
@@ -730,157 +731,222 @@
 
         // Export Day End button
         document.getElementById('exportDayEndButton').addEventListener('click', async () => {
-            // First preview the data
-            const result = await window.api.previewDayEnd();
+            // Default to today
+            let selectedDate = new Date();
+            let selectedDateStr = selectedDate.toISOString().split('T')[0];
 
-            if (!result.success) {
-                showToast('Error loading preview: ' + result.error, 'error');
-                return;
-            }
+            const showPreview = async (dateStr) => {
+                // Preview the data for selected date
+                const result = await window.api.previewDayEnd({ date: dateStr });
 
-            const exportData = result.exportData;
-            const today = result.date;
-            const row = new Date().getDate() + 1; // Row calculation for preview
-
-            if (exportData.length === 0) {
-                showToast('No sessions found for today.', 'warning');
-                return;
-            }
-
-            // Create modal to show export summary
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm px-4';
-
-            const summaryRows = exportData.map(item => `
-                <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
-                    <div class="flex-1">
-                        <p class="text-sm font-semibold text-white">${item.companyName}</p>
-                        <p class="text-xs text-gray-400">Col ${item.excelColumn || '-'} / ${item.noteColumn || '-'} • Row ${row}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm font-bold text-primary">${item.durationHours}h</p>
-                        <p class="text-xs text-gray-400 truncate max-w-[120px]">${item.notes || '-'}</p>
-                    </div>
-                </div>
-            `).join('');
-
-            modal.innerHTML = `
-                <div class="relative w-full max-w-sm bg-surface-dark rounded-3xl shadow-2xl border border-white/10 overflow-hidden transform transition-all">
-                    <div class="px-6 pt-8 pb-4 flex flex-col items-center justify-center text-center">
-                        <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-blue-900/50 to-primary/20 flex items-center justify-center mb-4 shadow-inner ring-1 ring-white/10">
-                            <span class="material-symbols-outlined text-primary text-3xl">summarize</span>
-                        </div>
-                        <h2 class="text-2xl font-bold text-white tracking-tight">Day End Summary</h2>
-                        <p class="text-sm text-gray-400 mt-2 font-medium">${today} • Row ${row}</p>
-                        <p class="text-xs text-gray-500 mt-1">Review data before exporting to Google Sheets</p>
-                    </div>
-                    <div class="px-6 pb-6">
-                        <div class="flex flex-col gap-2 max-h-60 overflow-y-auto mb-6 scrollbar-hide">
-                            ${summaryRows}
-                        </div>
-                        
-                        <div id="exportStatusArea"></div>
-
-                        <div class="flex gap-3" id="actionButtons">
-                            <button class="close-modal flex-1 py-3.5 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-2xl transition-all duration-200 border border-white/5">Cancel</button>
-                            <button id="confirmExportBtn" class="flex-1 py-3.5 bg-gradient-to-br from-primary to-blue-600 hover:from-blue-500 hover:to-blue-600 text-white font-semibold rounded-2xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all duration-200">
-                                Confirm & Export
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-
-            const confirmBtn = modal.querySelector('#confirmExportBtn');
-            const cancelBtn = modal.querySelector('.close-modal');
-            const statusArea = modal.querySelector('#exportStatusArea');
-            const actionButtons = modal.querySelector('#actionButtons');
-
-            // Validate columns
-            const invalidItems = exportData.filter(item => !item.excelColumn);
-            if (invalidItems.length > 0) {
-                confirmBtn.disabled = true;
-                confirmBtn.classList.add('opacity-50', 'cursor-not-allowed', 'grayscale');
-                confirmBtn.title = "Export disabled: Some companies are missing Excel Columns.";
-
-                const warningHtml = `
-                    <div class="p-3 rounded-xl bg-red-500/10 border border-red-500/20 mb-4 animate-in fade-in zoom-in duration-300">
-                        <p class="text-xs text-red-400 flex items-center gap-2 font-bold">
-                            <span class="material-symbols-outlined text-lg">block</span>
-                            Missing Configuration
-                        </p>
-                        <p class="text-[10px] text-red-500/70 ml-6 mt-0.5 mb-2">The following companies need an Excel Column set in 'Companies' page:</p>
-                        <ul class="list-disc list-inside text-[10px] text-red-400 ml-6">
-                            ${invalidItems.map(item => `<li>${item.companyName}</li>`).join('')}
-                        </ul>
-                    </div>
-                `;
-                statusArea.innerHTML = warningHtml;
-            }
-
-            // Handle Cancel
-            cancelBtn.addEventListener('click', () => modal.remove());
-            modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
-
-            // Handle Confirm
-            confirmBtn.addEventListener('click', async () => {
-                // Change button state
-                confirmBtn.innerHTML = `
-                    <div class="flex items-center justify-center gap-2">
-                        <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        <span>Sending...</span>
-                    </div>
-                `;
-                confirmBtn.disabled = true;
-                cancelBtn.disabled = true;
-
-                // Call export API
-                const result = await window.api.exportDayEnd();
-
-                // Process result
-                const googleSheets = result.googleSheets;
-                const finalRow = result.row || row;
-
-                let statusHtml = '';
-                if (googleSheets && googleSheets.success) {
-                    statusHtml = `
-                        <div class="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 mb-4 animate-in fade-in zoom-in duration-300">
-                            <p class="text-xs text-emerald-400 flex items-center gap-2 font-bold">
-                                <span class="material-symbols-outlined text-lg">check_circle</span>
-                                Successfully exported!
-                            </p>
-                            <p class="text-[10px] text-emerald-500/70 ml-6 mt-0.5">Data written to Row ${finalRow}</p>
-                        </div>
-                    `;
-                    // Change buttons to single 'Done' button
-                    actionButtons.innerHTML = `
-                        <button class="close-modal w-full py-3.5 bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-semibold rounded-2xl shadow-lg shadow-emerald-500/20 transition-all duration-200">Done</button>
-                    `;
-                    // Re-attach close handler to new button
-                    actionButtons.querySelector('.close-modal').addEventListener('click', () => modal.remove());
-
-                } else if (googleSheets && googleSheets.error) {
-                    const isConfigError = googleSheets.error === 'Script URL not configured';
-                    statusHtml = `
-                        <div class="p-3 rounded-xl ${isConfigError ? 'bg-yellow-500/10 border-yellow-500/20' : 'bg-red-500/10 border-red-500/20'} border mb-4 animate-in fade-in zoom-in duration-300">
-                            <p class="text-xs ${isConfigError ? 'text-yellow-400' : 'text-red-400'} flex items-center gap-2 font-bold">
-                                <span class="material-symbols-outlined text-lg">${isConfigError ? 'settings' : 'error'}</span>
-                                ${isConfigError ? 'Configuration Missing' : 'Export Failed'}
-                            </p>
-                            <p class="text-[10px] ${isConfigError ? 'text-yellow-500/70' : 'text-red-500/70'} ml-6 mt-0.5">
-                                ${isConfigError ? 'Please set Script URL in Settings' : googleSheets.error}
-                            </p>
-                        </div>
-                    `;
-                    // Reset buttons
-                    confirmBtn.innerHTML = 'Retry';
-                    confirmBtn.disabled = false;
-                    cancelBtn.disabled = false;
+                if (!result.success) {
+                    showToast('Error loading preview: ' + result.error, 'error');
+                    return;
                 }
 
-                statusArea.innerHTML = statusHtml;
-            });
+                const exportData = result.exportData;
+                const displayDate = result.date;
+                const dateObj = new Date(displayDate + 'T00:00:00');
+                const row = dateObj.getDate() + 1;
+
+                if (exportData.length === 0) {
+                    showToast(`No sessions found for ${displayDate}.`, 'warning');
+                    return;
+                }
+
+                // Create modal to show export summary
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm px-4';
+
+                const summaryRows = exportData.map(item => `
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-white">${item.companyName}</p>
+                            <p class="text-xs text-gray-400">Col ${item.excelColumn || '-'} / ${item.noteColumn || '-'} • Row ${row}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm font-bold text-primary">${item.durationHours}h</p>
+                            <p class="text-xs text-gray-400 truncate max-w-[120px]">${item.notes || '-'}</p>
+                        </div>
+                    </div>
+                `).join('');
+
+                const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+                modal.innerHTML = `
+                    <div class="relative w-full max-w-sm bg-surface-dark rounded-3xl shadow-2xl border border-white/10 overflow-hidden transform transition-all">
+                        <div class="px-6 pt-8 pb-4 flex flex-col items-center justify-center text-center">
+                            <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-blue-900/50 to-primary/20 flex items-center justify-center mb-4 shadow-inner ring-1 ring-white/10">
+                                <span class="material-symbols-outlined text-primary text-3xl">summarize</span>
+                            </div>
+                            <h2 class="text-2xl font-bold text-white tracking-tight">Day End Summary</h2>
+                            <p class="text-sm text-gray-400 mt-2 font-medium">${formattedDate} • Row ${row}</p>
+                            <p class="text-xs text-gray-500 mt-1">Review data before exporting to Google Sheets</p>
+                        </div>
+                        
+                        <!-- Date Selection -->
+                        <div class="px-6 pb-4">
+                            <button type="button" id="changeDateBtn" class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl text-white font-medium transition-all flex items-center justify-between">
+                                <span class="flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">calendar_today</span>
+                                    <span>Change Date</span>
+                                </span>
+                                <span class="material-symbols-outlined text-gray-400">expand_more</span>
+                            </button>
+                        </div>
+
+                        <div class="px-6 pb-6">
+                            <div class="flex flex-col gap-2 max-h-60 overflow-y-auto mb-6 scrollbar-hide">
+                                ${summaryRows}
+                            </div>
+                            
+                            <div id="exportStatusArea"></div>
+
+                            <div class="flex gap-3" id="actionButtons">
+                                <button class="close-modal flex-1 py-3.5 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-2xl transition-all duration-200 border border-white/5">Cancel</button>
+                                <button id="confirmExportBtn" class="flex-1 py-3.5 bg-gradient-to-br from-primary to-blue-600 hover:from-blue-500 hover:to-blue-600 text-white font-semibold rounded-2xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all duration-200">
+                                    Confirm & Export
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                // Change date button handler
+                modal.querySelector('#changeDateBtn').addEventListener('click', () => {
+                    const today = new Date();
+                    const currentDate = new Date(dateStr + 'T00:00:00');
+                    const isToday = currentDate.toDateString() === today.toDateString();
+                    const isYesterday = currentDate.toDateString() === new Date(today.getTime() - 86400000).toDateString();
+                    const is2DaysAgo = currentDate.toDateString() === new Date(today.getTime() - 172800000).toDateString();
+
+                    const getButtonClass = (isActive) => isActive
+                        ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/20'
+                        : 'bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/5';
+
+                    const dateModal = createModernModal({
+                        icon: 'calendar_month',
+                        title: 'Select Export Date',
+                        description: 'Choose which day to export.',
+                        content: `
+                            <div class="px-6 pb-2">
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 ml-1">Quick Select</label>
+                                <div class="grid grid-cols-3 gap-3">
+                                    <button class="quick-export-date flex flex-col items-center justify-center gap-1 py-4 ${getButtonClass(isToday)} font-semibold rounded-2xl active:scale-95 transition-all duration-200" data-offset="0">
+                                        <span class="material-symbols-outlined text-lg">today</span>
+                                        <span class="text-xs">Today</span>
+                                    </button>
+                                    <button class="quick-export-date flex flex-col items-center justify-center gap-1 py-4 ${getButtonClass(isYesterday)} font-semibold rounded-2xl active:scale-95 transition-all duration-200" data-offset="-1">
+                                        <span class="material-symbols-outlined text-lg">history</span>
+                                        <span class="text-xs">Yesterday</span>
+                                    </button>
+                                    <button class="quick-export-date flex flex-col items-center justify-center gap-1 py-4 ${getButtonClass(is2DaysAgo)} font-semibold rounded-2xl active:scale-95 transition-all duration-200" data-offset="-2">
+                                        <span class="material-symbols-outlined text-lg">event</span>
+                                        <span class="text-xs">2 Days Ago</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="px-8 py-4">
+                                <div class="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent w-full"></div>
+                            </div>
+
+                            <div class="px-6 pb-2">
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 ml-1">Custom Date</label>
+                                <div class="relative group">
+                                    <div class="absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none">
+                                        <span class="material-symbols-outlined text-primary text-xl">edit_calendar</span>
+                                    </div>
+                                    <input type="date" id="customExportDatePicker" value="${dateStr}" 
+                                        class="w-full pl-14 pr-5 py-4 bg-[#27272a] border border-transparent focus:border-primary/50 text-white rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all outline-none text-base font-medium shadow-inner cursor-pointer dark:[color-scheme:dark]" />
+                                </div>
+                            </div>
+
+                            <div class="p-6">
+                                <button class="close-date-modal w-full py-4 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-semibold rounded-2xl active:scale-95 transition-all duration-200 border border-white/5 tracking-wide">Close</button>
+                            </div>
+                        `
+                    });
+                    document.body.appendChild(dateModal);
+
+                    dateModal.querySelectorAll('.quick-export-date').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const offset = parseInt(btn.dataset.offset);
+                            const newDate = new Date();
+                            newDate.setDate(newDate.getDate() + offset);
+                            selectedDate = newDate;
+                            selectedDateStr = selectedDate.toISOString().split('T')[0];
+                            dateModal.remove();
+                            modal.remove();
+                            showPreview(selectedDateStr);
+                        });
+                    });
+
+                    dateModal.querySelector('#customExportDatePicker').addEventListener('change', (e) => {
+                        selectedDate = new Date(e.target.value + 'T00:00:00');
+                        selectedDateStr = e.target.value;
+                        dateModal.remove();
+                        modal.remove();
+                        showPreview(selectedDateStr);
+                    });
+
+                    dateModal.querySelector('.close-date-modal').addEventListener('click', () => dateModal.remove());
+                    dateModal.addEventListener('click', (e) => { if (e.target === dateModal) dateModal.remove(); });
+                });
+
+                const confirmBtn = modal.querySelector('#confirmExportBtn');
+                const cancelBtn = modal.querySelector('.close-modal');
+                const statusArea = modal.querySelector('#exportStatusArea');
+                const actionButtons = modal.querySelector('#actionButtons');
+
+                // Validate columns
+                const missingColumns = exportData.filter(item => !item.excelColumn);
+                if (missingColumns.length > 0) {
+                    statusArea.innerHTML = `
+                        <div class="mb-4 p-3 rounded-xl bg-orange-500/10 border border-orange-500/20">
+                            <p class="text-xs text-orange-300 font-medium">⚠️ Some companies are missing Excel column configuration.</p>
+                        </div>
+                    `;
+                }
+
+                confirmBtn.addEventListener('click', async () => {
+                    confirmBtn.disabled = true;
+                    confirmBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">progress_activity</span>';
+
+                    const exportResult = await window.api.exportDayEnd({ date: dateStr });
+
+                    if (exportResult.success) {
+                        statusArea.innerHTML = `
+                            <div class="mb-4 p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-center">
+                                <span class="material-symbols-outlined text-green-400 text-3xl mb-2">check_circle</span>
+                                <p class="text-sm text-green-300 font-semibold">Export Successful!</p>
+                                <p class="text-xs text-green-400/70 mt-1">Data sent to Google Sheets</p>
+                            </div>
+                        `;
+                        actionButtons.innerHTML = `
+                            <button class="close-modal w-full py-3.5 bg-primary hover:bg-primary/90 text-white font-semibold rounded-2xl transition-all duration-200">Done</button>
+                        `;
+                        modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
+                    } else {
+                        statusArea.innerHTML = `
+                            <div class="mb-4 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-center">
+                                <span class="material-symbols-outlined text-red-400 text-3xl mb-2">error</span>
+                                <p class="text-sm text-red-300 font-semibold">Export Failed</p>
+                                <p class="text-xs text-red-400/70 mt-1">${exportResult.error || 'Unknown error'}</p>
+                            </div>
+                        `;
+                        confirmBtn.disabled = false;
+                        confirmBtn.textContent = 'Retry';
+                    }
+                });
+
+                cancelBtn.addEventListener('click', () => modal.remove());
+                modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+            };
+
+            // Show preview for today initially
+            showPreview(selectedDateStr);
         });
 
         // Get current filter from localStorage
@@ -1058,7 +1124,16 @@
         });
 
         // Add session FAB
-        document.getElementById('addSessionFAB').addEventListener('click', () => {
+        document.getElementById('addSessionFAB').addEventListener('click', async () => {
+            // Load companies for the dropdown
+            const companiesRes = await window.api.getCompanies();
+            const companies = companiesRes.success ? companiesRes.companies : [];
+
+            // Create company options HTML
+            const companyOptions = companies.map(company =>
+                `<option value="${company.id}">${company.name}</option>`
+            ).join('');
+
             const modal = createModernModal({
                 icon: 'add_circle',
                 title: 'Add Work Session',
@@ -1071,6 +1146,20 @@
                             <input type="text" id="sessionName" placeholder="Work Session" class="w-full pl-5 pr-5 py-4 bg-[#27272a] border border-transparent focus:border-primary/50 text-white placeholder-gray-600 rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all outline-none text-base font-medium shadow-inner" />
                         </div>
                         <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 ml-1">Company</label>
+                            <div class="relative group">
+                                <div class="absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <span class="material-symbols-outlined text-primary text-xl">business</span>
+                                </div>
+                                <select id="sessionCompany" class="w-full pl-14 pr-12 py-4 bg-[#27272a] border border-transparent focus:border-primary/50 text-white rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all outline-none text-base font-medium shadow-inner appearance-none cursor-pointer">
+                                    ${companyOptions}
+                                </select>
+                                <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <span class="material-symbols-outlined text-gray-400 text-xl">expand_more</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 ml-1">Duration (hours)</label>
                             <input type="number" id="sessionHours" placeholder="8" min="0" step="0.5" class="w-full pl-5 pr-5 py-4 bg-[#27272a] border border-transparent focus:border-primary/50 text-white placeholder-gray-600 rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all outline-none text-base font-medium shadow-inner" />
                         </div>
@@ -1081,6 +1170,10 @@
                                 <span class="material-symbols-outlined text-gray-400">calendar_today</span>
                             </button>
                             <input type="hidden" id="sessionDate" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5 ml-1">Note (Optional)</label>
+                            <textarea id="sessionNote" rows="3" placeholder="Add a note..." class="w-full pl-5 pr-5 py-4 bg-[#27272a] border border-transparent focus:border-primary/50 text-white placeholder-gray-600 rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all outline-none text-base font-medium shadow-inner resize-none"></textarea>
                         </div>
                         <button id="saveNewSession" class="w-full py-4 mt-2 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white font-semibold rounded-2xl active:scale-95 transition-all duration-200 shadow-lg shadow-blue-500/20">Save Session</button>
                         <button class="close-add-modal w-full py-4 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-semibold rounded-2xl active:scale-95 transition-all duration-200 border border-white/5">Cancel</button>
@@ -1180,18 +1273,29 @@
 
             modal.querySelector('#saveNewSession').addEventListener('click', async () => {
                 const name = modal.querySelector('#sessionName').value.trim() || 'Work Session';
+                const companyId = parseInt(modal.querySelector('#sessionCompany').value);
                 const hours = parseFloat(modal.querySelector('#sessionHours').value) || 0;
                 const date = modal.querySelector('#sessionDate').value;
+                const note = modal.querySelector('#sessionNote').value.trim() || null;
 
                 if (hours <= 0) {
                     showToast('Please enter valid hours', 'warning');
                     return;
                 }
 
+                // Check if company requires note
+                const selectedCompany = companies.find(c => c.id === companyId);
+                if (selectedCompany && selectedCompany.note_required && !note) {
+                    showToast(`${selectedCompany.name} requires a note for work sessions`, 'warning');
+                    return;
+                }
+
                 const result = await window.api.saveSession({
                     name,
                     duration: Math.floor(hours * 3600),
-                    date
+                    date,
+                    companyId,
+                    note
                 });
 
                 if (result.success) {

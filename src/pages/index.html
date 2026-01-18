@@ -36,23 +36,25 @@
 
 <body
     class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-white antialiased selection:bg-primary selection:text-white">
-    <div class="app-container relative flex h-full w-full flex-col overflow-hidden max-w-md mx-auto shadow-2xl">
+    <div class="app-container relative flex h-screen w-full flex-col overflow-hidden max-w-md mx-auto shadow-2xl">
         <!-- TopAppBar -->
-        <header class="flex items-center p-6 justify-between z-10">
+        <header class="flex items-center p-6 justify-between z-10 shrink-0">
             <button id="datePickerBtn"
                 class="text-slate-500 dark:text-slate-400 flex items-center gap-2 hover:bg-slate-200 dark:hover:bg-surface-dark px-3 py-2 rounded-xl transition-colors">
                 <span class="material-symbols-outlined text-2xl">calendar_month</span>
                 <span id="dateDisplayHeader" class="text-sm font-semibold tracking-wide">OCT 24</span>
             </button>
             <h1 class="text-lg font-bold leading-tight tracking-tight hidden">Work Timer</h1>
-            <!-- Hidden for semantic structure, visible title is visually hidden or implied -->
-            <button id="settingsBtn"
-                class="flex items-center justify-center rounded-full w-10 h-10 bg-slate-200 dark:bg-surface-dark hover:bg-slate-300 dark:hover:bg-[#233c48] transition-colors text-slate-900 dark:text-white">
-                <span class="material-symbols-outlined">settings</span>
+            <!-- Pomodoro Mode Toggle -->
+            <button id="pomodoroToggleBtn"
+                class="flex items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 hover:bg-slate-200 dark:hover:bg-surface-dark">
+                <span class="material-symbols-outlined text-xl" id="pomodoroIcon" style="color: #94a3b8;">timer</span>
+                <span id="pomodoroModeText"
+                    class="text-xs font-semibold text-slate-500 dark:text-slate-400">Normal</span>
             </button>
         </header>
         <!-- Main Content Area -->
-        <main class="flex-1 flex flex-col px-6 pb-6 gap-4 overflow-y-auto no-scrollbar">
+        <main class="flex-1 flex flex-col px-6 pb-32 gap-4 overflow-y-auto">
             <!-- Stats Cards -->
             <div class="grid grid-cols-3 gap-3">
                 <div
@@ -100,10 +102,10 @@
             <!-- Main Timer Display -->
             <div class="flex-1 flex flex-col items-center justify-center relative min-h-[250px] shrink-0">
                 <!-- Headline Text -->
-                <h3 class="text-slate-400 dark:text-slate-500 text-sm font-bold uppercase tracking-[0.2em] mb-8">
+                <h3 class="text-slate-400 dark:text-slate-500 text-sm font-bold uppercase tracking-[0.2em] mb-3 mt-5">
                     Remaining</h3>
                 <!-- Circular Progress Timer -->
-                <div class="relative w-full max-w-[280px] aspect-square flex items-center justify-center">
+                <div class="relative w-full max-w-[300px] aspect-square flex items-center justify-center">
                     <svg class="absolute w-full h-full transform -rotate-90" viewBox="0 0 100 100">
 
                         <circle class="text-slate-200 dark:text-white/5" cx="50" cy="50" fill="none" r="45"
@@ -118,22 +120,27 @@
 
                     <div class="flex flex-col items-center z-10">
                         <div class="flex items-baseline gap-1 text-slate-900 dark:text-white drop-shadow-md">
-                            <span class="text-6xl font-bold tracking-tighter tabular-nums">04</span>
-                            <span class="text-4xl font-light text-slate-400 dark:text-white/30 -mt-2">:</span>
-                            <span class="text-6xl font-bold tracking-tighter tabular-nums">45</span>
-                            <span class="text-4xl font-light text-slate-400 dark:text-white/30 -mt-2">:</span>
+                            <span class="text-5xl font-bold tracking-tighter tabular-nums">04</span>
+                            <span class="text-3xl font-light text-slate-400 dark:text-white/30 -mt-2">:</span>
+                            <span class="text-5xl font-bold tracking-tighter tabular-nums">45</span>
+                            <span class="text-3xl font-light text-slate-400 dark:text-white/30 -mt-2">:</span>
                             <span
-                                class="text-4xl font-bold tracking-tighter tabular-nums text-slate-500 dark:text-slate-400">00</span>
+                                class="text-3xl font-bold tracking-tighter tabular-nums text-slate-500 dark:text-slate-400">00</span>
                         </div>
 
-                        <div
-                            class="mt-6 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 flex items-center gap-2 backdrop-blur-sm">
-                            <span class="relative flex h-2 w-2">
+                        <div class="mt-4 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 flex items-center gap-1.5 backdrop-blur-sm"
+                            id="statusBadge">
+                            <span class="relative flex h-1.5 w-1.5" id="statusBadgeDot">
                                 <span
                                     class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary"></span>
                             </span>
-                            <span class="text-xs font-bold text-primary uppercase tracking-widest">Focused</span>
+                            <span
+                                class="material-symbols-outlined text-[12px] text-red-500 hidden drop-shadow-[0_0_4px_rgba(239,68,68,0.6)]"
+                                id="pomodoroIconBadge"
+                                style="font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;">local_pizza</span>
+                            <span class="text-[10px] font-bold text-primary uppercase tracking-wider"
+                                id="statusBadgeText">Focused</span>
                         </div>
                     </div>
                 </div>
@@ -184,6 +191,7 @@
     </div>
 
     <!-- Scripts -->
+    <script src="../renderer/bottom-nav.js"></script>
     <script src="../renderer/shared.js"></script>
     <script src="../renderer/titlebar.js"></script>
     <script src="../renderer/timer.js"></script>
@@ -194,10 +202,23 @@
         let todayLogged = 0;
         let currentDate = new Date(); // Current selected date
 
+        // Pomodoro mode variables
+        let pomodoroEnabled = false;
+        let pomodoroSettings = {
+            workDuration: 25 * 60,
+            shortBreak: 5 * 60,
+            longBreak: 15 * 60,
+            sessionsUntilLongBreak: 4,
+            autoStartBreaks: true,
+            autoStartWork: false
+        };
+
         // DOM elements
         const dateDisplayHeader = document.getElementById('dateDisplayHeader');
         const datePickerBtn = document.getElementById('datePickerBtn');
-        const settingsBtn = document.getElementById('settingsBtn');
+        const pomodoroToggleBtn = document.getElementById('pomodoroToggleBtn');
+        const pomodoroIcon = document.getElementById('pomodoroIcon');
+        const pomodoroModeText = document.getElementById('pomodoroModeText');
         const targetDisplay = document.querySelectorAll('.grid >div')[0].querySelector('p.text-xl');
         const loggedDisplay = document.querySelectorAll('.grid > div')[1].querySelector('p.text-xl');
         const streakDisplay = document.getElementById('streakDisplay');
@@ -208,7 +229,8 @@
         const saveButton = document.getElementById('saveButton');
         const resetButton = document.getElementById('resetButton');
         const progressRing = document.querySelector('.progress-ring__circle');
-        const focusedBadge = document.querySelector('.mt-6.px-4');
+        const statusBadge = document.getElementById('statusBadge');
+        const statusBadgeText = document.getElementById('statusBadgeText');
         const finishTimeText = document.getElementById('finishTimeText');
 
         // Show alert modal helper
@@ -275,6 +297,35 @@
                 targetDisplay.textContent = formatTimeShort(dailyTarget);
             }
 
+            // Load Pomodoro settings
+            const pomodoroEnabledRes = await window.api.getSetting({ key: 'pomodoro_enabled' });
+
+            // Always load Pomodoro durations/settings so they are available for toggle
+            const workDurationRes = await window.api.getSetting({ key: 'pomodoro_work_duration' });
+            if (workDurationRes.success) pomodoroSettings.workDuration = parseInt(workDurationRes.value);
+
+            const shortBreakRes = await window.api.getSetting({ key: 'pomodoro_short_break' });
+            if (shortBreakRes.success) pomodoroSettings.shortBreak = parseInt(shortBreakRes.value);
+
+            const longBreakRes = await window.api.getSetting({ key: 'pomodoro_long_break' });
+            if (longBreakRes.success) pomodoroSettings.longBreak = parseInt(longBreakRes.value);
+
+            const sessionsRes = await window.api.getSetting({ key: 'pomodoro_sessions_until_long_break' });
+            if (sessionsRes.success) pomodoroSettings.sessionsUntilLongBreak = parseInt(sessionsRes.value);
+
+            const autoStartBreaksRes = await window.api.getSetting({ key: 'pomodoro_auto_start_breaks' });
+            if (autoStartBreaksRes.success) pomodoroSettings.autoStartBreaks = autoStartBreaksRes.value === 'true';
+
+            const autoStartWorkRes = await window.api.getSetting({ key: 'pomodoro_auto_start_work' });
+            if (autoStartWorkRes.success) pomodoroSettings.autoStartWork = autoStartWorkRes.value === 'true';
+
+            // Enable Pomodoro mode if enabled in settings
+            if (pomodoroEnabledRes.success && pomodoroEnabledRes.value === 'true') {
+                pomodoroEnabled = true;
+                timer.enablePomodoroMode(pomodoroSettings);
+                updatePomodoroUI();
+            }
+
             // Load streak
             await updateStreak();
 
@@ -290,7 +341,9 @@
             const state = {
                 elapsed: timer.getElapsed(),
                 running: timer.isRunning(),
-                timestamp: Date.now()
+                pomodoroMode: timer.pomodoroMode,
+                pomodoroState: timer.pomodoroState,
+                pomodoroSessionCount: timer.pomodoroSessionCount
             };
             localStorage.setItem('timerState', JSON.stringify(state));
         }
@@ -300,6 +353,21 @@
             if (saved) {
                 const state = JSON.parse(saved);
                 timer.elapsedSeconds = state.elapsed;
+
+                // Restore Pomodoro mode if it was active
+                if (state.pomodoroMode) {
+                    timer.pomodoroMode = state.pomodoroMode;
+                    timer.pomodoroState = state.pomodoroState || 'work';
+                    timer.pomodoroSessionCount = state.pomodoroSessionCount || 0;
+
+                    // IMPORTANT: Update timer logic with loaded settings
+                    // We need to make sure timer uses the correct duration logic
+                    timer.pomodoroSettings = { ...timer.pomodoroSettings, ...pomodoroSettings };
+
+                    pomodoroEnabled = true;
+                    updatePomodoroUI();
+                }
+
                 // Don't auto-start timer on page load, user must manually start it
                 // Just restore the elapsed time
                 updateTimer(state.elapsed);
@@ -311,6 +379,48 @@
 
         // Update timer display
         function updateTimer(elapsed) {
+            // Pomodoro mode: count down from target
+            if (timer.pomodoroMode) {
+                const target = timer.getPomodoroTarget();
+                const remaining = target - elapsed;
+
+                // Update Pomodoro UI
+                updatePomodoroUI();
+
+                // Update time digits (countdown)
+                const displayTime = Math.max(0, remaining);
+                const formatted = formatTime(displayTime);
+                const parts = formatted.split(':');
+                timerDigits[0].textContent = parts[0];
+                timerDigits[1].textContent = parts[1];
+                timerDigits[2].textContent = parts[2];
+
+                // Update progress ring
+                const progress = (elapsed / target) * 100;
+                const circumference = 283;
+                const offset = circumference - (Math.min(progress, 100) / 100) * circumference;
+                progressRing.setAttribute('stroke-dashoffset', offset);
+
+                // Ring color based on Pomodoro state
+                progressRing.classList.remove('text-primary', 'text-orange-500', 'text-emerald-500', 'text-red-500');
+                const info = timer.getPomodoroInfo();
+                if (info.state === 'work') {
+                    progressRing.classList.add('text-red-500'); // Red for work
+                } else {
+                    progressRing.classList.add('text-emerald-500'); // Green for break
+                }
+
+                // Update finish time
+                if (timer.isRunning() && remaining > 0) {
+                    finishTimeText.textContent = `${Math.ceil(remaining / 60)} min left`;
+                } else {
+                    finishTimeText.textContent = 'Session complete';
+                }
+
+                return;
+            }
+
+            // Normal mode: count up to daily target
             const remaining = dailyTarget - todayLogged - elapsed;
             const isExceeded = remaining < 0;
 
@@ -362,6 +472,37 @@
                 finishTimeText.textContent = isExceeded ? 'Goal Exceeded!' : 'Not running';
             }
         }
+
+        // Timer update callback
+        timer.onUpdate = (elapsed) => {
+            updateTimer(elapsed);
+
+            // Periodically save state (every second) to prevent data loss on reload
+            saveTimerState();
+
+            // Check daily target and play sound if needed
+            if (!playedSound && dailyTarget - todayLogged - elapsed <= 0) {
+                // Determine sound based on mode
+                let soundPath = '../assets/sounds/notification.mp3'; // Default
+                if (timer.pomodoroMode) {
+                    // For Pomodoro we would typically play sound on completion (handled elsewhere)
+                    // But if we are in work mode and reached target?
+                    // In Pomodoro mode, elapsed counts UP to target, so checking daily target here is for total work?
+                    // The timer.checkPomodoroCompletion() handles session end.
+                    // We should probably rely on onPomodoroComplete for session sounds.
+                } else {
+                    // Normal mode target reached
+                    const audio = new Audio(soundPath);
+                    audio.play().catch(e => console.error('Error playing sound:', e));
+                    playedSound = true;
+
+                    // Show notification
+                    new Notification('Daily Target Reached', {
+                        body: 'Congratulations! You have reached your daily goal.',
+                    });
+                }
+            }
+        };
 
         // Play notification sound and show alert
         function playNotification() {
@@ -759,9 +900,85 @@
             modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
         });
 
-        // Settings button navigation
-        settingsBtn.addEventListener('click', () => {
-            navigateWithLoading('settings.html');
+        // Pomodoro UI update function
+        function updatePomodoroUI() {
+            const pomodoroIconBadge = document.getElementById('pomodoroIconBadge');
+            const statusBadgeDot = document.getElementById('statusBadgeDot');
+
+            if (timer.pomodoroMode) {
+                // Pomodoro mode active
+                pomodoroIcon.style.color = '#ef4444'; // Red color
+                pomodoroModeText.textContent = 'Pomodoro';
+                pomodoroToggleBtn.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+
+                // Show icon, hide dot
+                pomodoroIconBadge.classList.remove('hidden');
+                statusBadgeDot.classList.add('hidden');
+
+                // Update status text based on state
+                const info = timer.getPomodoroInfo();
+                if (info.state === 'work') {
+                    statusText.textContent = 'WORK SESSION';
+                    statusBadgeText.textContent = `${info.sessionCount}/${pomodoroSettings.sessionsUntilLongBreak}`;
+                } else if (info.state === 'shortBreak') {
+                    statusText.textContent = 'SHORT BREAK';
+                    statusBadgeText.textContent = 'Break';
+                } else if (info.state === 'longBreak') {
+                    statusText.textContent = 'LONG BREAK';
+                    statusBadgeText.textContent = 'Long Break';
+                }
+            } else {
+                // Normal mode
+                pomodoroIcon.style.color = '#94a3b8'; // Gray color
+                pomodoroModeText.textContent = 'Normal';
+                pomodoroToggleBtn.style.backgroundColor = '';
+
+                // Hide icon, show dot
+                pomodoroIconBadge.classList.add('hidden');
+                statusBadgeDot.classList.remove('hidden');
+
+                statusText.textContent = 'REMAINING';
+                statusBadgeText.textContent = 'Focused';
+            }
+        }
+
+        // Pomodoro toggle button
+        pomodoroToggleBtn.addEventListener('click', async () => {
+            if (timer.pomodoroMode) {
+                // Disable Pomodoro mode
+                timer.disablePomodoroMode();
+                pomodoroEnabled = false;
+                // Sync with database
+                window.api.saveSetting({ key: 'pomodoro_enabled', value: 'false' });
+            } else {
+                // Reload Pomodoro settings from database before enabling
+                const workDurationRes = await window.api.getSetting({ key: 'pomodoro_work_duration' });
+                if (workDurationRes.success) pomodoroSettings.workDuration = parseInt(workDurationRes.value);
+
+                const shortBreakRes = await window.api.getSetting({ key: 'pomodoro_short_break' });
+                if (shortBreakRes.success) pomodoroSettings.shortBreak = parseInt(shortBreakRes.value);
+
+                const longBreakRes = await window.api.getSetting({ key: 'pomodoro_long_break' });
+                if (longBreakRes.success) pomodoroSettings.longBreak = parseInt(longBreakRes.value);
+
+                const sessionsRes = await window.api.getSetting({ key: 'pomodoro_sessions_until_long_break' });
+                if (sessionsRes.success) pomodoroSettings.sessionsUntilLongBreak = parseInt(sessionsRes.value);
+
+                const autoStartBreaksRes = await window.api.getSetting({ key: 'pomodoro_auto_start_breaks' });
+                if (autoStartBreaksRes.success) pomodoroSettings.autoStartBreaks = autoStartBreaksRes.value === 'true';
+
+                const autoStartWorkRes = await window.api.getSetting({ key: 'pomodoro_auto_start_work' });
+                if (autoStartWorkRes.success) pomodoroSettings.autoStartWork = autoStartWorkRes.value === 'true';
+
+                // Enable Pomodoro mode with updated settings
+                timer.enablePomodoroMode(pomodoroSettings);
+                pomodoroEnabled = true;
+                // Sync with database
+                window.api.saveSetting({ key: 'pomodoro_enabled', value: 'true' });
+            }
+            updatePomodoroUI();
+            updateTimer(timer.getElapsed());
+            saveTimerState(); // Save mode state to localStorage
         });
 
         // Logged card navigation -> history

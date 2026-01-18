@@ -9,6 +9,20 @@ class WorkTimer {
         this.elapsedSeconds = 0;
         this.interval = null;
         this.onUpdate = null; // Callback for UI updates
+
+        // Pomodoro mode properties
+        this.pomodoroMode = false;
+        this.pomodoroState = 'work'; // 'work', 'shortBreak', 'longBreak'
+        this.pomodoroSessionCount = 0;
+        this.pomodoroSettings = {
+            workDuration: 25 * 60,      // 25 minutes
+            shortBreak: 5 * 60,         // 5 minutes
+            longBreak: 15 * 60,         // 15 minutes
+            sessionsUntilLongBreak: 4,
+            autoStartBreaks: true,
+            autoStartWork: false
+        };
+        this.onPomodoroComplete = null; // Callback when session completes
     }
 
     /**
@@ -22,6 +36,12 @@ class WorkTimer {
 
         this.interval = setInterval(() => {
             this.elapsedSeconds = Math.floor((Date.now() - this.startTime) / 1000);
+
+            // Check Pomodoro completion
+            if (this.pomodoroMode) {
+                this.checkPomodoroCompletion();
+            }
+
             if (this.onUpdate) {
                 this.onUpdate(this.elapsedSeconds);
             }
@@ -80,6 +100,126 @@ class WorkTimer {
      */
     isRunning() {
         return this.running;
+    }
+
+    /**
+     * Enable Pomodoro mode
+     */
+    enablePomodoroMode(settings) {
+        this.pomodoroMode = true;
+        if (settings) {
+            this.pomodoroSettings = { ...this.pomodoroSettings, ...settings };
+        }
+        this.pomodoroState = 'work';
+        this.pomodoroSessionCount = 0;
+        this.reset();
+    }
+
+    /**
+     * Disable Pomodoro mode
+     */
+    disablePomodoroMode() {
+        this.pomodoroMode = false;
+        this.pomodoroState = 'work';
+        this.pomodoroSessionCount = 0;
+        this.reset();
+    }
+
+    /**
+     * Get current Pomodoro target duration
+     */
+    getPomodoroTarget() {
+        if (!this.pomodoroMode) return null;
+
+        switch (this.pomodoroState) {
+            case 'work':
+                return this.pomodoroSettings.workDuration;
+            case 'shortBreak':
+                return this.pomodoroSettings.shortBreak;
+            case 'longBreak':
+                return this.pomodoroSettings.longBreak;
+            default:
+                return this.pomodoroSettings.workDuration;
+        }
+    }
+
+    /**
+     * Check if Pomodoro session is complete
+     */
+    checkPomodoroCompletion() {
+        if (!this.pomodoroMode || !this.running) return false;
+
+        const target = this.getPomodoroTarget();
+        if (this.elapsedSeconds >= target) {
+            this.completePomodoroSession();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Complete current Pomodoro session
+     */
+    completePomodoroSession() {
+        this.pause();
+
+        if (this.pomodoroState === 'work') {
+            // Work session completed
+            this.pomodoroSessionCount++;
+
+            // Determine next break type
+            if (this.pomodoroSessionCount % this.pomodoroSettings.sessionsUntilLongBreak === 0) {
+                this.pomodoroState = 'longBreak';
+            } else {
+                this.pomodoroState = 'shortBreak';
+            }
+
+            // Auto-start break if enabled
+            if (this.pomodoroSettings.autoStartBreaks) {
+                this.reset();
+                setTimeout(() => this.start(), 1000);
+            } else {
+                this.reset();
+            }
+        } else {
+            // Break completed
+            this.pomodoroState = 'work';
+
+            // Auto-start work if enabled
+            if (this.pomodoroSettings.autoStartWork) {
+                this.reset();
+                setTimeout(() => this.start(), 1000);
+            } else {
+                this.reset();
+            }
+        }
+
+        // Trigger callback
+        if (this.onPomodoroComplete) {
+            this.onPomodoroComplete(this.pomodoroState, this.pomodoroSessionCount);
+        }
+    }
+
+    /**
+     * Skip current break (Pomodoro mode only)
+     */
+    skipBreak() {
+        if (!this.pomodoroMode || this.pomodoroState === 'work') return;
+
+        this.pomodoroState = 'work';
+        this.reset();
+    }
+
+    /**
+     * Get Pomodoro state info
+     */
+    getPomodoroInfo() {
+        return {
+            enabled: this.pomodoroMode,
+            state: this.pomodoroState,
+            sessionCount: this.pomodoroSessionCount,
+            target: this.getPomodoroTarget()
+        };
     }
 }
 
