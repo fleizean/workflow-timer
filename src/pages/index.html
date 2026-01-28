@@ -31,6 +31,260 @@
             transform: rotate(-90deg);
             transform-origin: 50% 50%;
         }
+
+        /* Streak Visual Effects */
+
+        /* Tier 1: Streak > 5 - Pulsing Effect */
+        @keyframes streak-pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.6));
+            }
+
+            50% {
+                transform: scale(1.1);
+                filter: drop-shadow(0 0 16px rgba(249, 115, 22, 0.9));
+            }
+        }
+
+        @keyframes streak-glow-pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 10px rgba(249, 115, 22, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 20px rgba(249, 115, 22, 0.6);
+            }
+        }
+
+        .streak-tier-1 {
+            animation: streak-glow-pulse 2s ease-in-out infinite;
+        }
+
+        .streak-tier-1 .streak-fire-icon {
+            animation: streak-pulse 2s ease-in-out infinite;
+        }
+
+        /* Tier 2: Streak > 10 - Particles */
+        @keyframes particle-float {
+            0% {
+                transform: translateY(0) translateX(0) scale(0);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-100px) translateX(var(--particle-x)) scale(1);
+                opacity: 0;
+            }
+        }
+
+        @keyframes streak-shimmer {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .streak-tier-2 {
+            background: linear-gradient(135deg,
+                    rgba(249, 115, 22, 0.1) 0%,
+                    rgba(251, 146, 60, 0.15) 50%,
+                    rgba(249, 115, 22, 0.1) 100%);
+            background-size: 200% 200%;
+            animation: streak-shimmer 3s ease-in-out infinite, streak-glow-pulse 2s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
+        }
+
+        .streak-tier-2 .streak-fire-icon {
+            animation: streak-pulse 1.5s ease-in-out infinite;
+        }
+
+        .streak-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle, rgba(251, 146, 60, 1) 0%, rgba(249, 115, 22, 0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particle-float 3s ease-in-out infinite;
+        }
+
+        .streak-particle:nth-child(1) {
+            --particle-x: -20px;
+            animation-delay: 0s;
+            left: 20%;
+        }
+
+        .streak-particle:nth-child(2) {
+            --particle-x: 20px;
+            animation-delay: 0.5s;
+            left: 40%;
+        }
+
+        .streak-particle:nth-child(3) {
+            --particle-x: -15px;
+            animation-delay: 1s;
+            left: 60%;
+        }
+
+        .streak-particle:nth-child(4) {
+            --particle-x: 15px;
+            animation-delay: 1.5s;
+            left: 80%;
+        }
+
+        .streak-particle:nth-child(5) {
+            --particle-x: 0px;
+            animation-delay: 2s;
+            left: 50%;
+        }
+
+        /* Tier 3: Streak > 20 - Fire Effect */
+        @keyframes fire-flicker {
+
+            0%,
+            100% {
+                transform: scale(1) translateY(0);
+                filter: drop-shadow(0 0 20px rgba(249, 115, 22, 1)) hue-rotate(0deg);
+            }
+
+            25% {
+                transform: scale(1.05) translateY(-2px);
+                filter: drop-shadow(0 0 25px rgba(251, 146, 60, 1)) hue-rotate(10deg);
+            }
+
+            50% {
+                transform: scale(1.1) translateY(-4px);
+                filter: drop-shadow(0 0 30px rgba(253, 186, 116, 1)) hue-rotate(20deg);
+            }
+
+            75% {
+                transform: scale(1.05) translateY(-2px);
+                filter: drop-shadow(0 0 25px rgba(251, 146, 60, 1)) hue-rotate(10deg);
+            }
+        }
+
+        @keyframes fire-border {
+
+            0%,
+            100% {
+                box-shadow:
+                    0 0 20px rgba(249, 115, 22, 0.8),
+                    0 0 40px rgba(249, 115, 22, 0.6),
+                    inset 0 0 20px rgba(249, 115, 22, 0.2);
+                border-color: rgba(249, 115, 22, 0.8);
+            }
+
+            50% {
+                box-shadow:
+                    0 0 30px rgba(251, 146, 60, 1),
+                    0 0 60px rgba(249, 115, 22, 0.8),
+                    inset 0 0 30px rgba(251, 146, 60, 0.3);
+                border-color: rgba(251, 146, 60, 1);
+            }
+        }
+
+        @keyframes fire-bg {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .streak-tier-3 {
+            background: linear-gradient(135deg,
+                    rgba(249, 115, 22, 0.3) 0%,
+                    rgba(251, 146, 60, 0.4) 25%,
+                    rgba(253, 186, 116, 0.3) 50%,
+                    rgba(251, 146, 60, 0.4) 75%,
+                    rgba(249, 115, 22, 0.3) 100%);
+            background-size: 400% 400%;
+            animation: fire-bg 2s ease-in-out infinite, fire-border 1.5s ease-in-out infinite;
+            border: 2px solid rgba(249, 115, 22, 0.8);
+        }
+
+        .streak-tier-3 .streak-fire-icon {
+            animation: fire-flicker 1s ease-in-out infinite;
+            font-variation-settings: 'FILL' 1;
+        }
+
+        .streak-flame {
+            position: absolute;
+            bottom: 0;
+            width: 8px;
+            height: 20px;
+            background: linear-gradient(to top,
+                    rgba(249, 115, 22, 0.8) 0%,
+                    rgba(251, 146, 60, 0.6) 50%,
+                    rgba(253, 186, 116, 0.2) 100%);
+            border-radius: 50% 50% 0 0;
+            pointer-events: none;
+            animation: flame-rise 1.5s ease-in-out infinite;
+        }
+
+        @keyframes flame-rise {
+            0% {
+                transform: translateY(0) scaleY(1);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: translateY(-10px) scaleY(1.2);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-20px) scaleY(0.5);
+                opacity: 0;
+            }
+        }
+
+        .streak-flame:nth-child(1) {
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .streak-flame:nth-child(2) {
+            left: 30%;
+            animation-delay: 0.3s;
+        }
+
+        .streak-flame:nth-child(3) {
+            left: 50%;
+            animation-delay: 0.6s;
+        }
+
+        .streak-flame:nth-child(4) {
+            left: 70%;
+            animation-delay: 0.9s;
+        }
+
+        .streak-flame:nth-child(5) {
+            left: 90%;
+            animation-delay: 1.2s;
+        }
     </style>
 </head>
 
@@ -83,13 +337,17 @@
                     </div>
                     <p class="text-xl font-bold leading-none tracking-tight relative z-10 whitespace-nowrap">03h 15m</p>
                 </div>
-                <div
+                <div id="streakCard"
                     class="flex flex-col gap-1 rounded-2xl p-4 bg-white dark:bg-surface-dark shadow-sm border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#233c48] transition-all duration-300 hover:scale-105 cursor-pointer relative overflow-hidden group">
                     <div
                         class="absolute inset-0 bg-orange-500/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out rounded-2xl">
                     </div>
+                    <!-- Particle container for Tier 2 -->
+                    <div id="streakParticles" class="absolute inset-0 pointer-events-none"></div>
+                    <!-- Flame container for Tier 3 -->
+                    <div id="streakFlames" class="absolute inset-0 pointer-events-none"></div>
                     <div class="flex items-center gap-1.5 mb-1 relative z-10">
-                        <span class="material-symbols-outlined streak-fire-icon text-orange-500 text-lg animate-pulse"
+                        <span class="material-symbols-outlined streak-fire-icon text-orange-500 text-lg"
                             style="font-variation-settings: 'FILL' 1; filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.6));">local_fire_department</span>
                         <p class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider">
                             Streak
@@ -276,12 +534,55 @@
             }
         }
 
+        // Apply streak visual effects based on streak value
+        function applyStreakEffects(streak) {
+            const streakCard = document.getElementById('streakCard');
+            const particlesContainer = document.getElementById('streakParticles');
+            const flamesContainer = document.getElementById('streakFlames');
+
+            // Remove all existing tier classes
+            streakCard.classList.remove('streak-tier-1', 'streak-tier-2', 'streak-tier-3');
+
+            // Clear particles and flames
+            particlesContainer.innerHTML = '';
+            flamesContainer.innerHTML = '';
+
+            // Apply effects based on streak value
+            if (streak > 20) {
+                // Tier 3: Fire effect
+                streakCard.classList.add('streak-tier-3');
+
+                // Create flame elements
+                for (let i = 0; i < 5; i++) {
+                    const flame = document.createElement('div');
+                    flame.className = 'streak-flame';
+                    flamesContainer.appendChild(flame);
+                }
+            } else if (streak > 10) {
+                // Tier 2: Particles
+                streakCard.classList.add('streak-tier-2');
+
+                // Create particle elements
+                for (let i = 0; i < 5; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'streak-particle';
+                    particlesContainer.appendChild(particle);
+                }
+            } else if (streak > 5) {
+                // Tier 1: Pulsing effect
+                streakCard.classList.add('streak-tier-1');
+            }
+        }
+
         // Update streak display
         async function updateStreak() {
             const streakRes = await window.api.getCurrentStreak();
             if (streakRes.success) {
                 const streak = streakRes.streak;
                 streakDisplay.textContent = streak === 1 ? '1 day' : `${streak} days`;
+
+                // Apply visual effects based on streak
+                applyStreakEffects(streak);
             }
         }
 
