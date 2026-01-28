@@ -85,7 +85,7 @@
             }
 
             100% {
-                transform: translateY(-100px) translateX(var(--particle-x)) scale(1);
+                transform: translateY(-150px) translateX(var(--particle-x)) scale(1);
                 opacity: 0;
             }
         }
@@ -109,7 +109,7 @@
                     rgba(249, 115, 22, 0.1) 100%);
             background-size: 200% 200%;
             animation: streak-shimmer 3s ease-in-out infinite, streak-glow-pulse 2s ease-in-out infinite;
-            box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
+            box-shadow: 0 0 10px rgba(249, 115, 22, 0.4);
         }
 
         .streak-tier-2 .streak-fire-icon {
@@ -118,8 +118,9 @@
 
         .streak-particle {
             position: absolute;
-            width: 4px;
-            height: 4px;
+            bottom: 0;
+            width: 6px;
+            height: 6px;
             background: radial-gradient(circle, rgba(251, 146, 60, 1) 0%, rgba(249, 115, 22, 0) 70%);
             border-radius: 50%;
             pointer-events: none;
@@ -156,6 +157,24 @@
             left: 50%;
         }
 
+        .streak-particle:nth-child(6) {
+            --particle-x: -25px;
+            animation-delay: 0.3s;
+            left: 25%;
+        }
+
+        .streak-particle:nth-child(7) {
+            --particle-x: 25px;
+            animation-delay: 1.2s;
+            left: 65%;
+        }
+
+        .streak-particle:nth-child(8) {
+            --particle-x: -10px;
+            animation-delay: 1.8s;
+            left: 85%;
+        }
+
         /* Tier 3: Streak > 20 - Fire Effect */
         @keyframes fire-flicker {
 
@@ -186,17 +205,17 @@
             0%,
             100% {
                 box-shadow:
-                    0 0 20px rgba(249, 115, 22, 0.8),
-                    0 0 40px rgba(249, 115, 22, 0.6),
-                    inset 0 0 20px rgba(249, 115, 22, 0.2);
+                    0 0 8px rgba(249, 115, 22, 0.8),
+                    0 0 15px rgba(249, 115, 22, 0.6),
+                    inset 0 0 10px rgba(249, 115, 22, 0.2);
                 border-color: rgba(249, 115, 22, 0.8);
             }
 
             50% {
                 box-shadow:
-                    0 0 30px rgba(251, 146, 60, 1),
-                    0 0 60px rgba(249, 115, 22, 0.8),
-                    inset 0 0 30px rgba(251, 146, 60, 0.3);
+                    0 0 12px rgba(251, 146, 60, 1),
+                    0 0 25px rgba(249, 115, 22, 0.8),
+                    inset 0 0 15px rgba(251, 146, 60, 0.3);
                 border-color: rgba(251, 146, 60, 1);
             }
         }
@@ -308,7 +327,7 @@
             </button>
         </header>
         <!-- Main Content Area -->
-        <main class="flex-1 flex flex-col px-6 pb-32 gap-4 overflow-y-auto">
+        <main class="flex-1 flex flex-col px-6 pb-32 pt-4 gap-4 overflow-y-auto">
             <!-- Stats Cards -->
             <div class="grid grid-cols-3 gap-3">
                 <div
@@ -339,13 +358,13 @@
                 </div>
                 <div id="streakCard"
                     class="flex flex-col gap-1 rounded-2xl p-4 bg-white dark:bg-surface-dark shadow-sm border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-[#233c48] transition-all duration-300 hover:scale-105 cursor-pointer relative overflow-hidden group">
+                    <!-- Hover background effect -->
                     <div
                         class="absolute inset-0 bg-orange-500/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out rounded-2xl">
                     </div>
-                    <!-- Particle container for Tier 2 -->
-                    <div id="streakParticles" class="absolute inset-0 pointer-events-none"></div>
-                    <!-- Flame container for Tier 3 -->
-                    <div id="streakFlames" class="absolute inset-0 pointer-events-none"></div>
+                    <!-- Canvas for fire animation (Tier 2 & 3) -->
+                    <canvas id="streakFireCanvas" class="absolute inset-0 pointer-events-none rounded-2xl"
+                        style="opacity: 0;"></canvas>
                     <div class="flex items-center gap-1.5 mb-1 relative z-10">
                         <span class="material-symbols-outlined streak-fire-icon text-orange-500 text-lg"
                             style="font-variation-settings: 'FILL' 1; filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.6));">local_fire_department</span>
@@ -534,42 +553,181 @@
             }
         }
 
+        // Brushstroke Fire Animation Class for Streak Effects
+        class StreakFireAnimation {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.particles = [];
+                this.animationId = null;
+                this.isRunning = false;
+                this.intensity = 'medium'; // 'medium' for tier 2, 'high' for tier 3
+
+                this.palette = [
+                    { r: 245, g: 167, b: 66 },    // Gold
+                    { r: 232, g: 90, b: 25 },     // Orange
+                    { r: 255, g: 62, b: 0 },      // Bright red-orange
+                    { r: 191, g: 34, b: 34 }      // Deep red
+                ];
+
+                this.time = 0;
+                this.resizeCanvas();
+            }
+
+            resizeCanvas() {
+                const rect = this.canvas.getBoundingClientRect();
+                this.canvas.width = rect.width;
+                this.canvas.height = rect.height;
+            }
+
+            start(intensity = 'medium') {
+                this.intensity = intensity;
+                this.isRunning = true;
+                this.canvas.style.opacity = '1';
+                this.createParticles();
+                this.animate();
+            }
+
+            stop() {
+                this.isRunning = false;
+                this.particles = [];
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.canvas.style.opacity = '0';
+            }
+
+            createParticles() {
+                const particleCount = this.intensity === 'high' ? 50 : 30;
+
+                for (let i = 0; i < particleCount; i++) {
+                    this.particles.push(this.createParticle());
+                }
+            }
+
+            createParticle() {
+                return {
+                    x: Math.random() * this.canvas.width,
+                    y: this.canvas.height + Math.random() * 20,
+                    size: 3 + Math.random() * (this.intensity === 'high' ? 12 : 8),
+                    opacity: 0.2 + Math.random() * 0.4,
+                    speedX: (Math.random() - 0.5) * 0.8,
+                    speedY: -0.8 - Math.random() * (this.intensity === 'high' ? 2 : 1.2),
+                    colorIndex: Math.floor(Math.random() * this.palette.length),
+                    rotation: Math.random() * Math.PI * 2,
+                    rotationSpeed: (Math.random() - 0.5) * 0.03,
+                    sway: 0.2 + Math.random() * 0.4,
+                    swaySpeed: 0.01 + Math.random() * 0.02,
+                    swayOffset: Math.random() * Math.PI * 2,
+                    lifespan: 80 + Math.random() * 120
+                };
+            }
+
+            animate() {
+                if (!this.isRunning) return;
+
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                this.time += 0.02;
+
+                // Update and draw particles
+                for (let i = 0; i < this.particles.length; i++) {
+                    const p = this.particles[i];
+
+                    // Update position
+                    p.x += p.speedX + Math.sin(this.time * p.swaySpeed + p.swayOffset) * p.sway;
+                    p.y += p.speedY;
+                    p.rotation += p.rotationSpeed;
+                    p.lifespan -= 1;
+
+                    // Calculate life factor for fading
+                    const lifeFactor = p.lifespan / 200;
+                    const currentSize = p.size * lifeFactor;
+                    const currentOpacity = p.opacity * lifeFactor;
+
+                    // Draw particle
+                    if (p.lifespan > 0) {
+                        this.drawBrushstroke(
+                            p.x,
+                            p.y,
+                            currentSize,
+                            p.rotation,
+                            this.palette[p.colorIndex],
+                            currentOpacity
+                        );
+                    }
+
+                    // Reset particle if it's faded or off screen
+                    if (p.lifespan <= 0 || p.y < -50) {
+                        this.particles[i] = this.createParticle();
+                    }
+                }
+
+                this.animationId = requestAnimationFrame(() => this.animate());
+            }
+
+            drawBrushstroke(x, y, size, rotation, color, opacity) {
+                this.ctx.save();
+                this.ctx.translate(x, y);
+                this.ctx.rotate(rotation);
+
+                // Create gradient for flame effect
+                const gradient = this.ctx.createLinearGradient(0, -size, 0, size);
+                gradient.addColorStop(0, `rgba(${color.r}, ${color.g}, ${color.b}, 0)`);
+                gradient.addColorStop(0.5, `rgba(${color.r}, ${color.g}, ${color.b}, ${opacity})`);
+                gradient.addColorStop(1, `rgba(${color.r}, ${color.g}, ${color.b}, 0)`);
+
+                this.ctx.fillStyle = gradient;
+
+                // Draw brushstroke shape
+                this.ctx.beginPath();
+                this.ctx.moveTo(-size / 3, -size);
+                this.ctx.quadraticCurveTo(size / 2, 0, -size / 3, size);
+                this.ctx.quadraticCurveTo(size / 2, 0, size / 3, -size / 2);
+                this.ctx.closePath();
+                this.ctx.fill();
+
+                // Add accent stroke
+                this.ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${opacity * 0.6})`;
+                this.ctx.beginPath();
+                this.ctx.ellipse(size / 6, 0, size / 4, size / 2, 0, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                this.ctx.restore();
+            }
+        }
+
+        // Global fire animation instance
+        let streakFireAnimation = null;
+
         // Apply streak visual effects based on streak value
         function applyStreakEffects(streak) {
             const streakCard = document.getElementById('streakCard');
-            const particlesContainer = document.getElementById('streakParticles');
-            const flamesContainer = document.getElementById('streakFlames');
+            const canvas = document.getElementById('streakFireCanvas');
+
+            // Initialize fire animation if not exists
+            if (!streakFireAnimation) {
+                streakFireAnimation = new StreakFireAnimation(canvas);
+            }
 
             // Remove all existing tier classes
             streakCard.classList.remove('streak-tier-1', 'streak-tier-2', 'streak-tier-3');
 
-            // Clear particles and flames
-            particlesContainer.innerHTML = '';
-            flamesContainer.innerHTML = '';
+            // Stop any existing animation
+            streakFireAnimation.stop();
 
             // Apply effects based on streak value
             if (streak > 20) {
-                // Tier 3: Fire effect
+                // Tier 3: Intense fire effect
                 streakCard.classList.add('streak-tier-3');
-
-                // Create flame elements
-                for (let i = 0; i < 5; i++) {
-                    const flame = document.createElement('div');
-                    flame.className = 'streak-flame';
-                    flamesContainer.appendChild(flame);
-                }
+                streakFireAnimation.start('high');
             } else if (streak > 10) {
-                // Tier 2: Particles
+                // Tier 2: Medium fire effect
                 streakCard.classList.add('streak-tier-2');
-
-                // Create particle elements
-                for (let i = 0; i < 5; i++) {
-                    const particle = document.createElement('div');
-                    particle.className = 'streak-particle';
-                    particlesContainer.appendChild(particle);
-                }
+                streakFireAnimation.start('medium');
             } else if (streak > 5) {
-                // Tier 1: Pulsing effect
+                // Tier 1: Pulsing effect only (no fire animation)
                 streakCard.classList.add('streak-tier-1');
             }
         }
@@ -1286,6 +1444,21 @@
         loggedDisplay.parentElement.parentElement.style.cursor = 'pointer';
         loggedDisplay.parentElement.parentElement.addEventListener('click', () => {
             navigateWithLoading('work-history.html');
+        });
+
+        // Streak card click handler for testing effects (cycles through tiers)
+        let testStreakIndex = 0;
+        const testStreakValues = [6, 15, 25]; // Tier 1, Tier 2, Tier 3
+        document.getElementById('streakCard').addEventListener('click', () => {
+            const testStreak = testStreakValues[testStreakIndex];
+            applyStreakEffects(testStreak);
+            streakDisplay.textContent = `${testStreak} days (TEST)`;
+            testStreakIndex = (testStreakIndex + 1) % testStreakValues.length;
+
+            // Reset to actual streak after 3 seconds
+            setTimeout(async () => {
+                await updateStreak();
+            }, 3000);
         });
 
         // Initialize
