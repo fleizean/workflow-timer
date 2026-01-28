@@ -57,7 +57,7 @@ function createWindow() {
     mainWindow.loadFile('src/pages/index.html');
 
     // Open DevTools in development (disabled for production)
-    mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
 }
 
 /**
